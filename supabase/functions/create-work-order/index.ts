@@ -66,14 +66,36 @@ Deno.serve(async req => {
       secret_ciphertext: encrypted?.ciphertext ?? null,
       secret_iv: encrypted?.iv ?? null
     });
-    if (error || !data?.[0]) return json(req, { error: "could_not_create_order" }, 400);
+    if (error || !data?.[0]) {
+      const code = error?.code ?? "unknown";
+      const message = code === "42501"
+        ? "Esta conta não tem permissão para criar ordens de serviço. Peça à administração para revisar o acesso da equipe."
+        : code === "P0002"
+          ? "O cliente selecionado não foi encontrado. Atualize a lista de clientes e tente novamente."
+          : code === "23505" && error?.message?.includes("customers_cpf_unique_idx")
+            ? "Este CPF já está cadastrado para outro cliente. Confira o CPF ou selecione o cadastro correto."
+            : code === "23505"
+              ? "Já existe um registro com esses dados. Confira o cadastro do cliente e tente novamente."
+              : code === "23514" || code.startsWith("22")
+                ? "Um dos dados informados não passou pela validação do banco. Revise os campos obrigatórios."
+                : `O banco recusou a criação da OS (código ${code}).`;
+      return json(req, { error: "could_not_create_order", message }, code === "42501" ? 403 : 400);
+    }
     return json(req, {
       orderId: data[0].id,
       orderNumber: data[0].order_number,
       accessCode,
       message: "Anote o código e entregue ao cliente. Ele não poderá ser recuperado depois."
     }, 201);
-  } catch {
-    return json(req, { error: "server_configuration_or_database_error" }, 503);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : "";
+    const message = reason === "device_secret_encryption_not_configured"
+      ? "A configuração de segurança do aparelho está incompleta no servidor. Avise a administração."
+      : reason === "device_secret_encryption_key_must_be_32_bytes"
+        ? "A configuração de segurança do aparelho está inválida no servidor. Avise a administração."
+        : reason === "server_configuration_missing"
+          ? "A configuração do Supabase está incompleta. Avise a administração."
+          : "O Supabase encontrou uma falha interna ao criar a OS. Tente novamente e, se persistir, avise a administração.";
+    return json(req, { error: "server_configuration_or_database_error", message }, 503);
   }
 });

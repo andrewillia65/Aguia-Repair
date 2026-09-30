@@ -455,8 +455,17 @@
     let data = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = text; }
     if (!response.ok) {
-      const error = new Error(data?.message || data?.hint || data?.details || "A operação foi recusada pelo servidor.");
+      const knownErrors = {
+        invalid_fields: "Revise os campos obrigatórios: nome, WhatsApp, marca, modelo e problema informado.",
+        unauthorized: "Sua sessão expirou. Saia da área da equipe e entre novamente.",
+        forbidden: "Esta conta não tem permissão para criar ordens de serviço. Peça à administração para verificar o acesso.",
+        customer_not_found: "O cliente selecionado não foi encontrado. Atualize a lista de clientes e tente novamente.",
+        could_not_create_order: "O banco recusou a criação da OS. Confira os dados e tente novamente.",
+        server_configuration_or_database_error: "O Supabase encontrou um erro de configuração ou de banco ao criar a OS."
+      };
+      const error = new Error(data?.message || data?.hint || data?.details || knownErrors[data?.error] || "A operação foi recusada pelo servidor.");
       error.status = response.status;
+      error.code = data?.error || data?.code || "";
       throw error;
     }
     return data;
