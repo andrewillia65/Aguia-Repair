@@ -7,53 +7,61 @@
   <meta name="description" content="ÁGUIA REPAIR — assistência técnica e microeletrônica. Produtos, informações de garantia e consulta de OS.">
   <title>ÁGUIA REPAIR — Assistência técnica</title>
   <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/portal.css">
+  <script src="assets/supabase-config.js" defer></script>
+  <script src="assets/public-portal.js" defer></script>
 </head>
 <body class="simple-home">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
   <header class="header wrap simple-header">
     <a class="brand" href="index.html" aria-label="Águia Repair, início">
-      <span class="brand-mark eagle-mark" aria-hidden="true"></span>
-      <span>ÁGUIA <strong>REPAIR</strong><small>ASSISTÊNCIA TÉCNICA & MICROELETRÔNICA</small></span>
+      <img class="brand-logo" src="assets/aguia-repair-logo.png" width="114" height="76" alt="Águia Repair">
     </a>
     <nav aria-label="Acessos">
-      <a href="funcionario.html">Funcionários</a>
-      <a class="button compact" href="cliente.html">Área do cliente</a>
+      <a href="#produtos">Produtos</a>
+      <a href="#consulta-os">Acompanhar OS</a>
+      <a href="#garantia">Garantia</a>
+      <a class="button compact" href="funcionario.html">Área da equipe</a>
     </nav>
   </header>
 
   <main id="conteudo" class="wrap simple-main">
     <section class="simple-intro" aria-labelledby="welcome-title">
       <img class="simple-hero-logo" src="assets/aguia-repair-logo.png" width="1536" height="1024" alt="Logotipo da Águia Repair" fetchpriority="high">
-      <p class="eyebrow">TECNOLOGIA QUE VOLTA A VOAR.</p>
-      <h1 id="welcome-title">Como podemos ajudar?</h1>
-      <p>Escolha uma opção abaixo. A Águia Repair cuida de assistência técnica e microeletrônica.</p>
-      <a class="simple-primary" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quero%20falar%20com%20a%20%C3%81guia%20Repair." target="_blank" rel="noopener noreferrer">Falar pelo WhatsApp <span aria-hidden="true">↗</span></a>
+      <p class="eyebrow">ASSISTÊNCIA TÉCNICA &amp; MICROELETRÔNICA</p>
+      <h1 id="welcome-title">Seu atendimento,<br><span>sem complicação.</span></h1>
+      <p>Consulte seu reparo, confira a garantia e veja os produtos da Águia Repair. Você não precisa criar uma conta.</p>
+      <a class="simple-primary" href="#consulta-os">Acompanhar meu reparo <span aria-hidden="true">↓</span></a>
     </section>
 
-    <section class="simple-options" aria-label="Opções de atendimento">
-      <article class="simple-card simple-products">
-        <span class="simple-icon" aria-hidden="true">◇</span>
-        <h2>Produtos</h2>
-        <p>O catálogo ainda não está publicado. Pergunte à equipe sobre os produtos disponíveis.</p>
-        <a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quais%20produtos%20est%C3%A3o%20dispon%C3%ADveis%3F" target="_blank" rel="noopener noreferrer">Perguntar sobre produtos <span aria-hidden="true">↗</span></a>
-      </article>
-      <article class="simple-card">
-        <span class="simple-icon" aria-hidden="true">⌕</span>
-        <h2>Acompanhar reparo</h2>
-        <p>A consulta online ainda não está disponível. Fale com a equipe sobre seu reparo.</p>
-        <a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20gostaria%20de%20consultar%20meu%20reparo.%20Como%20posso%20prosseguir%3F" target="_blank" rel="noopener noreferrer">Perguntar sobre meu reparo <span aria-hidden="true">↗</span></a>
-      </article>
-      <article class="simple-card">
-        <span class="simple-icon" aria-hidden="true">✧</span>
-        <h2>Garantia</h2>
-        <p>Confirme com a equipe as condições de garantia do serviço realizado.</p>
-        <a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20tenho%20uma%20d%C3%BAvida%20sobre%20a%20garantia%20do%20meu%20servi%C3%A7o." target="_blank" rel="noopener noreferrer">Perguntar sobre garantia <span aria-hidden="true">↗</span></a>
-      </article>
+    <section id="produtos" class="portal-section" aria-labelledby="products-heading">
+      <div class="portal-section-heading"><div><p class="eyebrow">CATÁLOGO ÁGUIA REPAIR</p><h2 id="products-heading">Produtos</h2></div><a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quero%20saber%20quais%20produtos%20est%C3%A3o%20dispon%C3%ADveis." target="_blank" rel="noopener noreferrer">Perguntar no WhatsApp <span aria-hidden="true">↗</span></a></div>
+      <div id="catalog-grid" class="catalog-grid" aria-live="polite"><p class="catalog-empty">O catálogo está sendo conectado. Se precisar, fale com a equipe pelo WhatsApp.</p></div>
     </section>
 
-    <p class="simple-note">Consultas online ainda estão em preparação. Os links abrem o WhatsApp com uma mensagem pronta; nada é enviado sem sua confirmação.</p>
+    <section id="consulta-os" class="portal-section portal-query" aria-labelledby="os-heading">
+      <div class="portal-section-heading"><div><p class="eyebrow">SEM CADASTRO</p><h2 id="os-heading">Acompanhe seu reparo</h2></div><p>Use o número da OS e o código de consulta recebido na loja.</p></div>
+      <form id="order-lookup-form" class="lookup-form">
+        <label>Número da OS<input name="orderNumber" autocomplete="off" placeholder="Ex.: AR-001234" required maxlength="20"></label>
+        <label>Código de consulta<input name="accessCode" autocomplete="off" placeholder="Código do seu comprovante" required maxlength="32"></label>
+        <button class="simple-primary" type="submit">Consultar OS <span aria-hidden="true">↗</span></button>
+      </form>
+      <div id="order-result" class="lookup-result" role="status" aria-live="polite"></div>
+      <p class="lookup-help">O código protege os detalhes do seu atendimento. Esta consulta não mostra telefone, observações internas ou senha do aparelho.</p>
+    </section>
+
+    <section id="garantia" class="portal-section" aria-labelledby="warranty-heading">
+      <div class="portal-section-heading"><div><p class="eyebrow">SEU SERVIÇO</p><h2 id="warranty-heading">Informações de garantia</h2></div><p>Consulte a garantia registrada para o seu reparo com os dados do comprovante.</p></div>
+      <form id="warranty-lookup-form" class="lookup-form">
+        <label>Número da OS<input name="orderNumber" autocomplete="off" placeholder="Ex.: AR-001234" required maxlength="20"></label>
+        <label>Código de consulta<input name="accessCode" autocomplete="off" placeholder="Código do seu comprovante" required maxlength="32"></label>
+        <button class="simple-primary" type="submit">Consultar garantia <span aria-hidden="true">↗</span></button>
+      </form>
+      <div id="warranty-result" class="lookup-result" role="status" aria-live="polite"></div>
+    </section>
+
     <section class="simple-contact" aria-label="Contato da Águia Repair">
-      <span class="contact-heading">Fale com a gente</span>
+      <span class="contact-heading">Precisa de ajuda?</span>
       <a href="https://wa.me/5527998784657" target="_blank" rel="noopener noreferrer"><span class="contact-name">WhatsApp</span><strong>(27) 99878-4657</strong><span aria-hidden="true">↗</span></a>
       <a href="https://www.instagram.com/aguiarepair/" target="_blank" rel="noopener noreferrer"><span class="contact-name">Instagram</span><strong>@aguiarepair</strong><span aria-hidden="true">↗</span></a>
     </section>

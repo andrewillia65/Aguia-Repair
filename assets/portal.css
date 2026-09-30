@@ -1,0 +1,38 @@
+.simple-home{scroll-behavior:smooth}
+.simple-home .brand{display:flex;align-items:center}
+.simple-home .brand-logo{display:block;width:112px;height:auto;max-height:75px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 5px 13px #0006)}
+.simple-home .header nav{gap:clamp(12px,2vw,24px)}
+.simple-intro{padding-top:24px}
+.simple-intro h1 span{color:#e4c47d}
+.portal-section{margin-top:24px;padding:clamp(22px,4vw,34px);border:1px solid #ffffff20;border-radius:22px;background:linear-gradient(145deg,#ffffff0e,#ffffff04);box-shadow:0 18px 50px #0003,inset 0 1px #ffffff14;backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);scroll-margin-top:20px}
+.portal-section-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}
+.portal-section-heading .eyebrow{margin:0 0 7px;font-size:9px}
+.portal-section-heading h2{margin:0;font-size:clamp(23px,4vw,32px);font-weight:600;letter-spacing:-.8px}
+.portal-section-heading>p{max-width:370px;margin:0;color:#b8b8c0;font-size:13px;line-height:1.65}
+.catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.catalog-empty{grid-column:1/-1;margin:0;padding:20px;border:1px dashed #ffffff28;border-radius:14px;color:#b6b6be;font-size:13px;line-height:1.6;text-align:center}
+.catalog-card{overflow:hidden;border:1px solid #ffffff1e;border-radius:15px;background:#1113188c}
+.catalog-card img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:#191a1e}
+.catalog-card-body{padding:17px}
+.catalog-card h3{margin:0 0 7px;font-size:16px;font-weight:600}
+.catalog-card p{margin:0;color:#b6b6be;font-size:12px;line-height:1.6}
+.catalog-card .catalog-price{margin-top:11px;color:#f0d48f;font-weight:650}
+.lookup-form{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}
+.lookup-form label{display:grid;gap:7px;color:#dddde1;font-size:12px;font-weight:600}
+.lookup-form input{width:100%;min-height:48px;padding:0 13px;border:1px solid #ffffff25;border-radius:12px;background:#0d0e12a8;color:#f4f3ef;font:inherit;font-size:14px;outline:none}
+.lookup-form input::placeholder{color:#888992;font-weight:400}
+.lookup-form input:focus{border-color:#e4c47d;box-shadow:0 0 0 3px #e4c47d20}
+.lookup-form .simple-primary{min-height:48px;margin:0;white-space:nowrap}
+.simple-home .button:disabled,.simple-home button:disabled{opacity:.55;cursor:wait}
+.lookup-help{margin:14px 0 0;color:#9697a0;font-size:11px;line-height:1.6}
+.lookup-result:empty{display:none}
+.lookup-result{margin-top:15px;padding:16px;border:1px solid #e4c47d38;border-radius:14px;background:#e4c47d0c;color:#f4f3ef;font-size:13px;line-height:1.7}
+.lookup-result h3{margin:0 0 5px;font-size:16px}
+.lookup-result p{margin:4px 0;color:#c5c5cb}
+.lookup-result ol{margin:8px 0 0;padding-left:21px;color:#c5c5cb}
+.lookup-error{border-color:#ff73734f;background:#ff73730b}
+.simple-contact{margin-top:24px}
+@media(max-width:760px){.simple-home .brand-logo{width:90px;max-height:60px}.simple-home .header nav{flex-wrap:wrap;justify-content:flex-end;gap:10px 15px}.simple-home .header nav>a:not(.button){font-size:12px}.simple-intro{padding:36px 0 23px}.portal-section{padding:20px;border-radius:17px}.portal-section-heading{display:block}.portal-section-heading>p{margin-top:11px}.catalog-grid{grid-template-columns:1fr}.catalog-card{display:grid;grid-template-columns:110px 1fr;align-items:stretch}.catalog-card img{height:100%;aspect-ratio:auto}.catalog-card-body{padding:13px}.lookup-form{grid-template-columns:1fr}.lookup-form .simple-primary{width:100%}.simple-contact{gap:12px 18px}}
+@media(max-width:380px){.simple-home .brand-logo{width:78px}.simple-home .header nav{gap:8px}.simple-home .header nav>a:not(.button){font-size:11px}.portal-section{padding:16px}.catalog-card{grid-template-columns:88px 1fr}}
+@media(prefers-reduced-motion:reduce){.simple-home{scroll-behavior:auto}}
+.public-quote{margin:1.25rem 0;padding:1.25rem;border:1px solid rgba(217,178,102,.38);border-radius:1rem;background:rgba(217,178,102,.07)}.public-quote h4{margin:0 0 .75rem;color:#e5c47f;font-size:1.05rem}.public-quote p{margin:.45rem 0}.quote-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1rem}.quote-actions button{min-height:46px;padding:.7rem 1rem;border:1px solid #d9b266;border-radius:.75rem;background:#d9b266;color:#171717;font:inherit;font-weight:700;cursor:pointer}.quote-actions button+button{background:transparent;color:#f1eee8}.quote-actions button:disabled{opacity:.6;cursor:wait}

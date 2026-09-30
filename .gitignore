@@ -1,3 +1,9 @@
 /_archive/
 /_review/
 /ANALISE-E-ARQUITETURA.md
+.env
+.env.*
+!.env.example
+/supabase/.env
+/supabase/.env.*
+/supabase/functions/.env

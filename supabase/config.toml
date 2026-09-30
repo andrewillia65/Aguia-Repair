@@ -1,0 +1,17 @@
+[functions.public-order-lookup]
+verify_jwt = false
+
+[functions.public-quote-decision]
+verify_jwt = false
+
+[functions.create-work-order]
+verify_jwt = true
+
+[functions.update-work-order-status]
+verify_jwt = true
+
+[functions.device-access-secret]
+verify_jwt = true
+
+[functions.invite-staff]
+verify_jwt = true

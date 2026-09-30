@@ -1,0 +1,6 @@
+# Keep database migrations, Edge Functions, setup tools, and internal docs out of the public site.
+exclude:
+  - supabase/
+  - scripts/
+  - docs/
+  - "*.sql"

@@ -1,2 +1,190 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101112"><meta name="robots" content="noindex"><title>Área do funcionário — ÁGUIA REPAIR</title><link rel="stylesheet" href="assets/site.css"><script src="assets/site.js" defer></script></head><body><a class="skip" href="#conteudo">Pular para o conteúdo</a><header class="header wrap"><a class="brand" href="index.html" aria-label="Águia Repair, início"><span class="brand-mark eagle-mark" aria-hidden="true"></span><span>ÁGUIA <strong>REPAIR</strong><small>ASSISTÊNCIA TÉCNICA & MICROELETRÔNICA</small></span></a><button class="menu-toggle" aria-expanded="false" aria-controls="navigation">Menu <span aria-hidden="true">☰</span></button><nav id="navigation" aria-label="Navegação principal"><a href="index.html">Início</a><a href="consultas.html" >Consultas</a><a href="cliente.html" >Cliente</a><a href="funcionario.html" aria-current="page">Funcionário</a></nav></header><main class="portal wrap" id="conteudo"><div class="breadcrumb"><a href="index.html">Início</a><span aria-hidden="true">/</span><span>Área do funcionário</span></div><div class="portal-heading"><p class="eyebrow">ACESSO EXCLUSIVO DA EQUIPE</p><h1>Precisão também na gestão.</h1><p>Entrada separada para a equipe ÁGUIA REPAIR. O ambiente de trabalho dependerá de uma conta autorizada e das permissões de cada função.</p></div><div class="portal-grid"><section class="locked-card" aria-labelledby="acesso-equipe"><div class="lock-symbol" aria-hidden="true"><svg width="21" height="24" viewBox="0 0 24 28" fill="none"><rect x="3" y="12" width="18" height="13" rx="2" stroke="currentColor"/><path d="M7 12V7a5 5 0 0 1 10 0v5" stroke="currentColor"/><path d="M12 17v4" stroke="currentColor"/></svg></div><span class="pill">Acesso indisponível</span><h2 id="acesso-equipe">Autenticação em preparação</h2><p>A entrada da equipe ainda não está disponível. Nenhum painel operacional, registro de cliente ou informação interna é apresentado nesta página.</p><div class="locked-actions"><button class="button" disabled aria-describedby="equipe-status">Entrar como funcionário</button></div><p class="privacy-note" id="equipe-status">Nenhuma credencial é solicitada. A liberação do acesso dependerá da autenticação real e da validação de permissões no servidor.</p></section><section class="feature-panel"><h2>Acesso conforme sua função</h2><p>Os perfis abaixo descrevem a organização planejada. Eles não concedem acesso nesta etapa.</p><ul class="feature-list"><li><span aria-hidden="true">◇</span><div><strong>Identidade verificada</strong><p>Contas da equipe provisionadas por um administrador autorizado.</p></div></li><li><span aria-hidden="true">◇</span><div><strong>Permissões individuais</strong><p>Cada ação dependerá do perfil e do vínculo com o atendimento.</p></div></li><li><span aria-hidden="true">◇</span><div><strong>Rastreabilidade</strong><p>A evolução prevê registro das ações e alterações relevantes.</p></div></li></ul></section></div><div class="roles" aria-label="Perfis previstos"><article class="role"><p class="eyebrow">PERFIL PREVISTO / 01</p><h3>Administrador</h3><p>Gestão de equipe, permissões e operação, com registro das alterações.</p></article><article class="role"><p class="eyebrow">PERFIL PREVISTO / 02</p><h3>Técnico</h3><p>Diagnóstico e atualização técnica das OS atribuídas à sua responsabilidade.</p></article><article class="role"><p class="eyebrow">PERFIL PREVISTO / 03</p><h3>Funcionário</h3><p>Recebimento, atendimento e entrega, conforme as permissões concedidas.</p></article></div><p class="role-note">A seleção de perfil será feita pelo sistema a partir da conta autenticada. Não haverá escolha de função para obter privilégios.</p></main><footer class="footer wrap"><div class="footer-brand">ÁGUIA <strong>REPAIR</strong><p>Tecnologia que volta a voar.</p></div><div><a href="index.html">Página pública</a><a href="cliente.html">Cliente</a><a href="funcionario.html">Funcionário</a><a href="consultas.html">Consultas</a></div><small>Serviços digitais em preparação. Nenhum dado é coletado por esta interface.</small></footer></body></html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0d10">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Área da equipe — Águia Repair</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/portal.css">
+  <link rel="stylesheet" href="assets/staff.css">
+  <script src="assets/supabase-config.js" defer></script>
+  <script src="assets/staff-app.js" defer></script>
+</head>
+<body class="simple-home staff-page">
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <header class="header wrap staff-header">
+    <a class="brand" href="index.html" aria-label="Águia Repair, página pública"><img class="brand-logo" src="assets/aguia-repair-logo.png" width="114" height="76" alt="Águia Repair"></a>
+    <a class="staff-public-link" href="index.html">Voltar ao site público ↗</a>
+  </header>
+
+  <main id="conteudo" class="wrap staff-main">
+    <section id="staff-login-panel" class="staff-login-card" aria-labelledby="staff-title">
+      <p class="eyebrow">ACESSO RESTRITO À EQUIPE</p>
+      <h1 id="staff-title">Entrar na gestão</h1>
+      <p class="staff-intro">Use a conta autorizada pela administração da Águia Repair. Clientes não precisam de cadastro.</p>
+      <form id="staff-invite-form" class="staff-form" hidden>
+        <p>Seu convite foi confirmado. Defina uma senha para ativar seu acesso.</p>
+        <label>Nova senha (mínimo de 12 caracteres)<input name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="200"></label>
+        <label>Repita a nova senha<input name="passwordConfirmation" type="password" autocomplete="new-password" required minlength="12" maxlength="200"></label>
+        <button class="simple-primary" type="submit">Ativar acesso <span aria-hidden="true">↗</span></button>
+        <p id="staff-invite-message" class="staff-message" role="status" aria-live="polite"></p>
+      </form>
+      <form id="staff-login-form" class="staff-form">
+        <label>E-mail<input name="email" type="email" autocomplete="username" required maxlength="200"></label>
+        <label>Senha<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
+        <button class="simple-primary" type="submit">Entrar <span aria-hidden="true">↗</span></button>
+        <p id="staff-login-message" class="staff-message" role="status" aria-live="polite"></p>
+      </form>
+      <p class="staff-footnote">Não existe cadastro público. A senha e a sessão não são gravadas no armazenamento do navegador.</p>
+    </section>
+
+    <section id="staff-dashboard" class="staff-dashboard" hidden aria-label="Painel da equipe">
+      <header class="staff-topbar">
+        <div><p class="eyebrow">GESTÃO ÁGUIA REPAIR</p><h1 id="staff-greeting">Painel da equipe</h1></div>
+        <div class="staff-account"><span id="staff-role"></span><button id="staff-logout" class="staff-logout" type="button">Sair</button></div>
+      </header>
+      <p id="staff-global-message" class="staff-message" role="status" aria-live="polite"></p>
+      <div class="staff-layout">
+        <nav class="staff-sidebar" aria-label="Menu da gestão">
+          <button type="button" data-screen-target="overview" class="is-active">Visão geral</button>
+          <button type="button" data-screen-target="orders">Ordens de serviço</button>
+          <button type="button" data-screen-target="customers">Clientes</button>
+          <button type="button" data-screen-target="catalog">Produtos</button>
+          <button type="button" data-screen-target="inventory">Estoque</button>
+          <button type="button" data-screen-target="warranties">Garantias</button>
+          <button type="button" data-screen-target="finance" data-admin-only hidden>Financeiro</button>
+          <button type="button" data-screen-target="team" data-admin-only hidden>Equipe</button>
+        </nav>
+
+        <div class="staff-workspace">
+          <section class="staff-screen" data-screen="overview">
+            <div class="staff-screen-heading"><div><p class="eyebrow">ACOMPANHAMENTO</p><h2>Visão geral</h2></div><button type="button" class="staff-action" data-open-new-order>+ Nova OS</button></div>
+            <div class="staff-metrics">
+              <article><span>Ordens abertas</span><strong id="metric-open">—</strong></article>
+              <article><span>Aguardando aprovação</span><strong id="metric-approval">—</strong></article>
+              <article><span>Produtos publicados</span><strong id="metric-products">—</strong></article>
+            </div>
+            <div class="staff-panel"><h3>Ordens recentes</h3><div id="overview-orders" class="staff-table-wrap"><p class="staff-empty">Carregando dados...</p></div></div>
+          </section>
+
+          <section class="staff-screen" data-screen="orders" hidden>
+            <div class="staff-screen-heading"><div><p class="eyebrow">ATENDIMENTO</p><h2>Ordens de serviço</h2></div><button type="button" class="staff-action" data-open-new-order>+ Nova OS</button></div>
+            <div id="orders-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando ordens...</p></div>
+            <details class="staff-panel staff-details" id="new-order-details">
+              <summary>Registrar uma nova OS</summary>
+              <form id="new-order-form" class="staff-form staff-form-grid">
+                <h3 class="form-section-title">Cliente</h3>
+                <label>Nome<input name="customerName" required maxlength="160"></label>
+                <label>WhatsApp<input name="customerWhatsapp" type="tel" required maxlength="24" autocomplete="off"></label>
+                <h3 class="form-section-title">Aparelho</h3>
+                <label>Marca<input name="brand" required maxlength="80"></label>
+                <label>Modelo<input name="model" required maxlength="120"></label>
+                <label>Cor<input name="color" maxlength="80"></label>
+                <label>Sistema<select name="platform"><option value="">Não informado</option><option value="android">Android</option><option value="iphone">iPhone</option><option value="other">Outro</option></select></label>
+                <label>Bloqueio<select name="lockType"><option value="none">Sem bloqueio necessário</option><option value="pin">PIN</option><option value="password">Senha</option><option value="pattern">Padrão Android</option><option value="other">Outro</option></select></label>
+                <label class="span-two">PIN/senha/padrão (opcional)<input name="accessSecret" type="password" autocomplete="new-password" maxlength="200"><small>Quando necessário, o servidor cifra o dado. Ele não aparece nas consultas do cliente.</small></label>
+                <h3 class="form-section-title">Entrada</h3>
+                <label class="span-two">Problema informado<textarea name="reportedIssue" required rows="3" maxlength="4000"></textarea></label>
+                <label class="span-two">Estado físico<textarea name="physicalCondition" rows="2" maxlength="3000"></textarea></label>
+                <label class="span-two">Acessórios entregues<input name="accessories" placeholder="Ex.: capa, carregador" maxlength="1000"></label>
+                <label class="span-two">Fotos da entrada<input name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>Até 6 imagens, máximo de 10 MB cada. Arquivos ficam privados para a equipe.</small></label>
+                <label class="span-two">Observações internas<textarea name="internalNotes" rows="2" maxlength="3000"></textarea></label>
+                <button class="simple-primary span-two" type="submit">Criar OS e gerar código do cliente <span aria-hidden="true">↗</span></button>
+                <p id="new-order-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+                <div id="new-order-result" class="order-created span-two" hidden></div>
+              </form>
+            </details>
+            <form id="quote-form" class="staff-panel staff-form staff-form-grid">
+              <h3 class="form-section-title">Enviar orçamento para aprovação</h3>
+              <label>Número da OS<input name="orderNumber" required maxlength="20" placeholder="AR-001234"></label>
+              <label>Valor total<input name="total" type="number" min="0" step="0.01" required></label>
+              <label class="span-two">Serviço e peças incluídos<textarea name="summary" required rows="3" maxlength="2000"></textarea></label>
+              <button class="staff-action span-two" type="submit">Enviar orçamento</button>
+              <p id="quote-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="staff-screen" data-screen="customers" hidden>
+            <div class="staff-screen-heading"><div><p class="eyebrow">CADASTROS</p><h2>Clientes</h2></div></div>
+            <div id="customers-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando clientes...</p></div>
+          </section>
+
+          <section class="staff-screen" data-screen="catalog" hidden>
+            <div class="staff-screen-heading"><div><p class="eyebrow">VITRINE PÚBLICA</p><h2>Produtos</h2></div></div>
+            <form id="catalog-form" class="staff-panel staff-form staff-form-grid">
+              <h3 class="form-section-title">Adicionar produto ao catálogo</h3>
+              <label>Nome<input name="name" required maxlength="160"></label>
+              <label>Preço (opcional)<input name="price" type="number" min="0" step="0.01"></label>
+              <label class="span-two">Descrição<textarea name="description" rows="2" maxlength="2000"></textarea></label>
+              <label class="span-two">Imagem (URL segura)<input name="imageUrl" type="url" maxlength="1000"></label>
+              <label class="staff-checkbox span-two"><input name="isPublished" type="checkbox"> Publicar no site</label>
+              <button class="staff-action span-two" type="submit">Salvar produto</button>
+              <p id="catalog-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+            </form>
+            <div id="catalog-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando catálogo...</p></div>
+          </section>
+
+          <section class="staff-screen" data-screen="inventory" hidden>
+            <div class="staff-screen-heading"><div><p class="eyebrow">CONTROLE INTERNO</p><h2>Estoque</h2></div></div>
+            <form id="inventory-form" class="staff-panel staff-form staff-form-grid">
+              <h3 class="form-section-title">Adicionar item ao estoque</h3>
+              <label>Nome<input name="name" required maxlength="160"></label>
+              <label>Código/SKU<input name="sku" maxlength="100"></label>
+              <label>Quantidade inicial<input name="quantity" type="number" min="0" step="1" value="0" required></label>
+              <label>Estoque mínimo<input name="minimumQuantity" type="number" min="0" step="1" value="0" required></label>
+              <label>Custo unitário<input name="unitCost" type="number" min="0" step="0.01" value="0" required></label>
+              <button class="staff-action span-two" type="submit">Salvar item</button>
+              <p id="inventory-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+            </form>
+            <div id="inventory-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando estoque...</p></div>
+          </section>
+
+          <section class="staff-screen" data-screen="warranties" hidden>
+            <div class="staff-screen-heading"><div><p class="eyebrow">PÓS-REPARO</p><h2>Garantias</h2></div></div>
+            <form id="warranty-form" class="staff-panel staff-form staff-form-grid">
+              <h3 class="form-section-title">Registrar garantia de uma OS</h3>
+              <label>Número da OS<input name="orderNumber" required maxlength="20" placeholder="AR-001234"></label>
+              <label>Início<input name="startsOn" type="date" required></label>
+              <label>Validade<input name="expiresOn" type="date" required></label>
+              <label class="span-two">Cobertura informada ao cliente<textarea name="coverageSummary" required rows="2" maxlength="2000"></textarea></label>
+              <button class="staff-action span-two" type="submit">Registrar garantia</button>
+              <p id="warranty-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+            </form>
+            <div id="warranties-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando garantias...</p></div>
+          </section>
+
+          <section class="staff-screen" data-screen="finance" hidden>
+            <div class="staff-screen-heading"><div><p class="eyebrow">ACESSO ADMINISTRATIVO</p><h2>Financeiro</h2></div></div>
+            <form id="finance-form" class="staff-panel staff-form staff-form-grid">
+              <h3 class="form-section-title">Lançamento</h3>
+              <label>Tipo<select name="entryType"><option value="income">Entrada</option><option value="expense">Saída</option></select></label>
+              <label>Valor<input name="amount" type="number" min="0.01" step="0.01" required></label>
+              <label class="span-two">Descrição<input name="description" required maxlength="1000"></label>
+              <label>Data<input name="occurredOn" type="date" required></label>
+              <button class="staff-action span-two" type="submit">Registrar lançamento</button>
+              <p id="finance-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+            </form>
+            <div id="finance-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando lançamentos...</p></div>
+          </section>
+
+          <section class="staff-screen" data-screen="team" hidden>
+            <div class="staff-screen-heading"><div><p class="eyebrow">CONTAS AUTORIZADAS</p><h2>Equipe</h2></div></div>
+            <form id="invite-form" class="staff-panel staff-form staff-form-grid">
+              <h3 class="form-section-title">Convidar funcionário</h3>
+              <label>Nome<input name="displayName" required maxlength="120"></label>
+              <label>E-mail<input name="email" type="email" required maxlength="200"></label>
+              <label>Função<select name="role"><option value="employee">Funcionário</option><option value="technician">Técnico</option></select></label>
+              <button class="staff-action span-two" type="submit">Enviar convite</button>
+              <p id="invite-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+            </form>
+            <div id="team-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando equipe...</p></div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="simple-footer wrap"><span>ÁGUIA REPAIR</span><span>Área exclusiva da equipe</span></footer>
+</body>
+</html>

@@ -17,7 +17,7 @@
 .simple-home .wrap{width:min(1040px,calc(100% - 48px))}
 .simple-header{min-height:84px;border-bottom:1px solid #ffffff14}
 .simple-home .brand{font-size:17px;letter-spacing:1.5px}
-.simple-home .brand-mark{width:38px;height:40px;border-radius:11px 4px 11px 4px;background:linear-gradient(140deg,#e4c47d24,#e4c47d08);box-shadow:inset 0 1px #ffffff25;transform:rotate(-4deg)}
+
 .simple-home .brand small{font-size:6px;letter-spacing:1.2px}
 .simple-home .header nav{gap:22px;font-size:12px}
 .simple-home .header nav>a:not(.button){color:#c9c9cd}
@@ -42,14 +42,14 @@
 .simple-footer{display:flex;justify-content:space-between;gap:18px;align-items:center;min-height:55px;border-top:1px solid #ffffff14;color:#a9a9b0;font-size:10px}
 .simple-footer span:first-child{letter-spacing:1.3px;color:#dfc27e}.simple-footer span:last-child{letter-spacing:0;color:#92939b}
 .simple-footer a:hover{color:var(--gold)}
-@media(max-width:760px){.simple-home .wrap{width:calc(100% - 36px)}.simple-header{min-height:0;padding-block:17px;flex-wrap:wrap;gap:14px}.simple-home .brand{font-size:15px}.simple-home .brand-mark{width:33px;height:36px;font-size:23px}.simple-home .brand small{font-size:5px;letter-spacing:1px}.simple-home .header nav{width:100%;justify-content:space-between;gap:12px;padding:0;font-size:11px}.simple-home .button.compact{padding:10px 13px}.simple-main{min-height:0;padding-bottom:35px}.simple-intro{padding:53px 0 25px}.simple-intro h1{font-size:clamp(32px,9vw,43px);letter-spacing:-1.5px}.simple-intro>p:last-child{font-size:12px}.simple-options{grid-template-columns:1fr;gap:10px}.simple-card{min-height:0;padding:18px;border-radius:16px}.simple-icon{width:33px;height:33px;margin-bottom:13px;font-size:15px}.simple-card h2{font-size:16px}.simple-card p{min-height:0;margin-bottom:12px;font-size:10px}.simple-note{font-size:9px}.simple-footer{min-height:50px}}
+@media(max-width:760px){.simple-home .wrap{width:calc(100% - 36px)}.simple-header{min-height:0;padding-block:17px;flex-wrap:wrap;gap:14px}.simple-home .brand{font-size:15px}.simple-home .brand small{font-size:5px;letter-spacing:1px}.simple-home .header nav{width:100%;justify-content:space-between;gap:12px;padding:0;font-size:11px}.simple-home .button.compact{padding:10px 13px}.simple-main{min-height:0;padding-bottom:35px}.simple-intro{padding:53px 0 25px}.simple-intro h1{font-size:clamp(32px,9vw,43px);letter-spacing:-1.5px}.simple-intro>p:last-child{font-size:12px}.simple-options{grid-template-columns:1fr;gap:10px}.simple-card{min-height:0;padding:18px;border-radius:16px}.simple-icon{width:33px;height:33px;margin-bottom:13px;font-size:15px}.simple-card h2{font-size:16px}.simple-card p{min-height:0;margin-bottom:12px;font-size:10px}.simple-note{font-size:9px}.simple-footer{min-height:50px}}
 @media(max-width:340px){.simple-home .wrap{width:calc(100% - 28px)}.simple-home .brand{font-size:13px}.simple-home .brand small{font-size:4px}}
 @media(prefers-reduced-motion:reduce){.simple-card,.simple-home .button{transition:none}}
 
 /* Brand, larger type and direct contact details for the simple homepage. */
 .simple-home{font-family:"Segoe UI Variable Display","Segoe UI Variable","Segoe UI",Inter,system-ui,-apple-system,sans-serif;font-size:16px}
 .simple-home .brand{gap:12px;font-size:19px;letter-spacing:1.5px}
-.simple-home .brand-mark{flex:0 0 46px;width:46px;height:46px;border:1px solid #e4c47d42;border-radius:13px;background-color:#0d0e11;background-image:url("aguia-repair-logo.png");background-repeat:no-repeat;background-size:auto 80px;background-position:center top;box-shadow:0 5px 20px #0006,inset 0 1px #ffffff18}
+
 .simple-home .brand small{font-size:8px;letter-spacing:1.25px}
 .simple-home .header nav{font-size:14px}
 .simple-home .button{font-size:14px}
@@ -72,10 +72,9 @@
 .contact-name{color:#a8a8af}
 .simple-contact strong{color:#f0d48f;font-size:14px;font-weight:600}
 .simple-footer{font-size:12px}
-@media(max-width:760px){.simple-home .brand{font-size:17px}.simple-home .brand-mark{flex-basis:40px;width:40px;height:40px;background-size:auto 70px}.simple-home .brand small{font-size:7px;letter-spacing:.9px}.simple-home .header nav{font-size:13px}.simple-home .button{font-size:13px}.simple-intro{padding-top:39px}.simple-hero-logo{width:170px;margin-bottom:12px}.simple-intro .eyebrow{font-size:10px}.simple-intro h1{font-size:clamp(36px,9vw,48px)}.simple-intro>p:last-child{font-size:15px}.simple-card{padding:20px}.simple-card h2{font-size:19px}.simple-card p{font-size:13px}.simple-link{font-size:13px}.simple-note{font-size:11px}.simple-contact{flex-wrap:wrap;gap:12px 20px;padding:14px}.contact-heading{flex-basis:100%;margin:0}.simple-contact a{font-size:12px}.simple-contact strong{font-size:13px}.simple-footer{font-size:11px}}
-@media(max-width:360px){.simple-home .brand{font-size:15px}.simple-home .brand-mark{flex-basis:37px;width:37px;height:37px;background-size:auto 65px}.simple-home .brand small{font-size:6px}.simple-contact{gap:10px}.simple-contact a{font-size:11px}.simple-contact strong{font-size:12px}}
+@media(max-width:760px){.simple-home .brand{font-size:17px}.simple-home .brand small{font-size:7px;letter-spacing:.9px}.simple-home .header nav{font-size:13px}.simple-home .button{font-size:13px}.simple-intro{padding-top:39px}.simple-hero-logo{width:170px;margin-bottom:12px}.simple-intro .eyebrow{font-size:10px}.simple-intro h1{font-size:clamp(36px,9vw,48px)}.simple-intro>p:last-child{font-size:15px}.simple-card{padding:20px}.simple-card h2{font-size:19px}.simple-card p{font-size:13px}.simple-link{font-size:13px}.simple-note{font-size:11px}.simple-contact{flex-wrap:wrap;gap:12px 20px;padding:14px}.contact-heading{flex-basis:100%;margin:0}.simple-contact a{font-size:12px}.simple-contact strong{font-size:13px}.simple-footer{font-size:11px}}
+@media(max-width:360px){.simple-home .brand{font-size:15px}.simple-home .brand small{font-size:6px}.simple-contact{gap:10px}.simple-contact a{font-size:11px}.simple-contact strong{font-size:12px}}
 .simple-primary{display:inline-flex;align-items:center;gap:14px;margin-top:21px;padding:15px 21px;border:1px solid #f0d899;border-radius:13px;background:linear-gradient(140deg,#f1dba6,#d4ad63);box-shadow:0 10px 28px #d6b57424;color:#17150f;font-size:15px;font-weight:650;transition:transform .2s,box-shadow .2s}
 .simple-primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px #d6b5743d}
 @media(max-width:760px){.simple-primary{margin-top:17px;padding:13px 18px;font-size:14px}}
 @media(prefers-reduced-motion:reduce){.simple-primary{transition:none}}
-.eagle-mark{font-size:0!important;color:transparent!important;border-color:transparent!important;border-radius:10px;transform:none;background-image:url("aguia-repair-logo.png");background-repeat:no-repeat;background-size:auto 78px;background-position:center top}
