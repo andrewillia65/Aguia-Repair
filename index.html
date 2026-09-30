@@ -1,102 +1,67 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0a0a0a">
-<title>Águia Repair — Sistema</title>
-<style>
-*{box-sizing:border-box}html,body{margin:0;background:#080808;color:#f5f5f5;font-family:Inter,Arial,sans-serif}body{min-height:100vh}:root{--gold:#d4a017;--panel:#141414;--line:#2b2b2b;--muted:#969696}
-.app{min-height:100vh}.side{position:fixed;z-index:20;inset:0 auto 0 0;width:245px;background:#0d0d0d;border-right:1px solid var(--line);padding:24px 15px;transition:transform .25s ease}.brand{font-weight:900;letter-spacing:2px;font-size:21px}.brand span{color:var(--gold)}.desc{font-size:9px;color:#888;letter-spacing:1px;margin-top:5px;line-height:1.4}.nav{margin-top:30px}.nav button{display:block;width:100%;background:transparent;border:0;color:#aaa;text-align:left;padding:13px 12px;border-radius:8px;margin:3px 0;cursor:pointer;font-size:14px}.nav button:hover,.nav button.active{background:#211b0d;color:#fff;border-left:3px solid var(--gold)}
-main{margin-left:245px;width:calc(100% - 245px);padding:28px;max-width:1500px}.mobilebar{display:none}.page{display:none}.page.active{display:block}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}h1{font-size:27px;margin:0}.sub{color:var(--muted);font-size:12px;margin-top:5px}.btn{background:var(--gold);color:#111;border:0;border-radius:8px;padding:11px 16px;font-weight:800;cursor:pointer}.btn2{background:#242424;color:#fff;border:1px solid #333;border-radius:8px;padding:11px 16px;cursor:pointer}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card,.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}.card small{color:#999}.num{font-size:30px;font-weight:900;margin-top:9px}.grid{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-top:16px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.muted{font-size:12px;color:var(--muted);margin-top:4px}.tag{font-size:11px;background:#292929;padding:5px 8px;border-radius:20px;white-space:nowrap}.ok{background:#14301a;color:#7cdb8d}.warn{background:#342a12;color:#e6be52}.blue{background:#16283f;color:#82b4ff}.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:6px}.full{grid-column:1/-1}.field label{font-size:12px;color:#aaa}.field input,.field select,.field textarea,.search{background:#0b0b0b;border:1px solid #333;color:#fff;border-radius:7px;padding:11px;outline:0;width:100%}.field textarea{min-height:85px;resize:vertical}.actions{text-align:right;margin-top:20px}.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}.column{background:#101010;border:1px solid var(--line);border-radius:10px;padding:10px;min-height:230px}.column h3{font-size:11px;color:#aaa}.ticket{background:#191919;border:1px solid #303030;border-radius:8px;padding:11px;margin:8px 0;cursor:pointer}.ticket:hover{border-color:var(--gold)}.modal{display:none;position:fixed;inset:0;background:#000b;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.show{display:flex}.modalbox{width:min(720px,100%);max-height:90vh;overflow:auto;background:#151515;border:1px solid #333;border-radius:14px;padding:22px}
-.menu-overlay{display:none}
-@media(max-width:900px){
- .side{width:270px;transform:translateX(-100%);padding:22px 16px;box-shadow:15px 0 40px #000}.side.open{transform:translateX(0)}.brand{font-size:20px}.desc{display:block}.nav button{font-size:14px;text-align:left}.menu-overlay.show{display:block;position:fixed;z-index:15;inset:0;background:#0009}
- main{margin-left:0;width:100%;padding:0 14px 28px}.mobilebar{height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;background:#080808;border-bottom:1px solid #202020;margin:0 -14px 22px;padding:0 14px}.mobile-brand{font-weight:900;letter-spacing:1.5px;font-size:17px}.mobile-brand span{color:var(--gold)}.hamb{width:42px;height:42px;border-radius:10px;background:#151515;border:1px solid #333;color:#fff;font-size:23px}.mobile-new{background:var(--gold);border:0;color:#111;border-radius:9px;padding:10px 12px;font-weight:800}
- .top{align-items:flex-start;margin-bottom:16px}.top h1{font-size:24px}.top .btn{padding:10px 12px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{padding:15px;min-height:108px}.num{font-size:28px}.grid{grid-template-columns:1fr;gap:12px}.box{padding:15px}.row{align-items:flex-start}.row>span,.row>.tag{margin-top:2px}.form{grid-template-columns:1fr;gap:12px}.full{grid-column:auto}.actions{display:flex;gap:8px;justify-content:flex-end}.pipeline{display:flex;overflow-x:auto;gap:10px;padding-bottom:8px;scroll-snap-type:x mandatory}.column{min-width:78vw;scroll-snap-align:start}.search{margin-bottom:2px}.modal{padding:12px}.modalbox{padding:16px}
-}
-@media(max-width:420px){.mobile-new{font-size:12px;padding:9px 10px}.cards{grid-template-columns:1fr 1fr}.card small{font-size:11px}.top{gap:8px}.top .btn{font-size:12px}.row b{font-size:13px}.row .muted{font-size:11px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0d10">
+  <meta name="description" content="ÁGUIA REPAIR — assistência técnica e microeletrônica. Produtos, informações de garantia e consulta de OS.">
+  <title>ÁGUIA REPAIR — Assistência técnica</title>
+  <link rel="stylesheet" href="assets/site.css">
 </head>
-<body>
-<div class="app"><div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
-<aside class="side">
-<div class="brand">ÁGUIA <span>REPAIR</span></div>
-<div class="desc">ASSISTÊNCIA TÉCNICA & MICROELETRÔNICA</div>
-<nav class="nav">
-<button class="active" onclick="showPage('dash',this)">⌂ &nbsp; Dashboard</button>
-<button onclick="showPage('new',this)">＋ &nbsp; Nova OS</button>
-<button onclick="showPage('orders',this)">▣ &nbsp; Ordens de Serviço</button>
-<button onclick="showPage('clients',this)">♙ &nbsp; Clientes</button>
-<button onclick="showPage('products',this)">▤ &nbsp; Produtos</button>
-<button onclick="showPage('warranty',this)">✓ &nbsp; Garantias</button>
-</nav>
-</aside>
-<main>
-<div class="mobilebar"><button class="hamb" onclick="toggleMenu()">☰</button><div class="mobile-brand">ÁGUIA <span>REPAIR</span></div><button class="mobile-new" onclick="showPage('new')">+ OS</button></div>
-<section id="dash" class="page active">
-<div class="top"><div><h1>Dashboard</h1><div class="sub">Tecnologia que volta a voar.</div></div><button class="btn" onclick="showPage('new')">+ Nova OS</button></div>
-<div class="cards">
-<div class="card"><small>Recebidos</small><div class="num" id="received">8</div></div><div class="card"><small>Diagnóstico</small><div class="num">3</div></div><div class="card"><small>Em reparo</small><div class="num">4</div></div><div class="card"><small>Prontos</small><div class="num">2</div></div><div class="card"><small>Entregues hoje</small><div class="num">5</div></div>
-</div>
-<div class="grid"><div class="box"><h2>Ordens recentes</h2><div id="recent"></div></div><div class="box"><h2>Acesso rápido</h2><button class="btn" style="width:100%;margin:5px 0" onclick="showPage('new')">Cadastrar nova OS</button><button class="btn2" style="width:100%;margin:5px 0" onclick="showPage('orders')">Ver reparos</button><button class="btn2" style="width:100%;margin:5px 0" onclick="showPage('warranty')">Garantias</button></div></div>
-</section>
+<body class="simple-home">
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <header class="header wrap simple-header">
+    <a class="brand" href="index.html" aria-label="Águia Repair, início">
+      <span class="brand-mark eagle-mark" aria-hidden="true"></span>
+      <span>ÁGUIA <strong>REPAIR</strong><small>ASSISTÊNCIA TÉCNICA & MICROELETRÔNICA</small></span>
+    </a>
+    <nav aria-label="Acessos">
+      <a href="funcionario.html">Funcionários</a>
+      <a class="button compact" href="cliente.html">Área do cliente</a>
+    </nav>
+  </header>
 
-<section id="new" class="page"><div class="top"><div><h1>Nova Ordem de Serviço</h1><div class="sub">Entrada do aparelho.</div></div></div>
-<div class="box"><form id="osForm" class="form">
-<div class="field"><label>Nome do cliente *</label><input id="client" required></div><div class="field"><label>WhatsApp *</label><input id="phone" required></div>
-<div class="field"><label>Marca *</label><input id="brand" required></div><div class="field"><label>Modelo *</label><input id="model" required></div>
-<div class="field"><label>Cor</label><input id="color"></div><div class="field"><label>Sistema</label><select id="system"><option>Não informado</option><option>Android</option><option>iPhone / iOS</option></select></div>
-<div class="field"><label>Tipo de bloqueio</label><select id="lock"><option>Sem bloqueio</option><option>PIN</option><option>Senha</option><option>Padrão</option><option>Biometria</option></select></div><div class="field"><label>Senha / PIN — uso interno</label><input id="password" type="password"></div>
-<div class="field full"><label>Padrão de desbloqueio — uso interno</label><div style="background:#0b0b0b;border:1px solid #333;border-radius:8px;padding:8px"><canvas id="patternCanvas" style="width:100%;height:170px;display:block;touch-action:none;background:#090909;border-radius:6px"></canvas><div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px;color:#888;font-size:11px"><span>Desenhe o padrão</span><button type="button" class="btn2" onclick="clearPattern()">Limpar</button></div></div></div>
-<div class="field full"><label>Problema relatado *</label><textarea id="problem" required></textarea></div>
-<div class="field"><label>Estado físico</label><textarea id="condition"></textarea></div><div class="field"><label>Acessórios</label><textarea id="accessories"></textarea></div>
-<div class="field full"><label>Observações</label><textarea id="notes"></textarea></div>
-</form><div class="actions"><button class="btn2" onclick="showPage('dash')">Cancelar</button> <button class="btn" onclick="createOS()">Criar OS</button></div></div></section>
+  <main id="conteudo" class="wrap simple-main">
+    <section class="simple-intro" aria-labelledby="welcome-title">
+      <img class="simple-hero-logo" src="assets/aguia-repair-logo.png" width="1536" height="1024" alt="Logotipo da Águia Repair" fetchpriority="high">
+      <p class="eyebrow">TECNOLOGIA QUE VOLTA A VOAR.</p>
+      <h1 id="welcome-title">Como podemos ajudar?</h1>
+      <p>Escolha uma opção abaixo. A Águia Repair cuida de assistência técnica e microeletrônica.</p>
+      <a class="simple-primary" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quero%20falar%20com%20a%20%C3%81guia%20Repair." target="_blank" rel="noopener noreferrer">Falar pelo WhatsApp <span aria-hidden="true">↗</span></a>
+    </section>
 
-<section id="orders" class="page"><div class="top"><div><h1>Ordens de Serviço</h1><div class="sub">Clique em uma OS para abrir.</div></div><button class="btn" onclick="showPage('new')">+ Nova OS</button></div><input class="search" id="search" placeholder="Pesquisar..." oninput="renderOrders()"><div class="pipeline" id="pipeline"></div></section>
-<section id="clients" class="page"><div class="top"><div><h1>Clientes</h1><div class="sub">Histórico de atendimentos.</div></div></div><div class="box" id="clientsList"></div></section>
-<section id="products" class="page"><div class="top"><div><h1>Produtos e Estoque</h1><div class="sub">Peças e acessórios.</div></div><button class="btn" onclick="alert('Módulo de cadastro de produtos entra na próxima etapa.')">+ Produto</button></div><div class="box"><div class="row"><div><b>Tela iPhone 13</b><div class="muted">Peças · Estoque: 4</div></div><b>R$ 650,00</b></div><div class="row"><div><b>Cabo USB-C</b><div class="muted">Acessórios · Estoque: 18</div></div><b>R$ 39,90</b></div></div></section>
-<section id="warranty" class="page"><div class="top"><div><h1>Garantias</h1><div class="sub">Certificados.</div></div></div><div class="box"><div class="row"><div><b>GR-1042-8F21</b><div class="muted">OS #1042 · iPhone 13</div></div><span class="tag ok">Válida</span></div><div class="row"><div><b>GR-1037-4C10</b><div class="muted">OS #1037 · Redmi Note 12</div></div><span class="tag">Expirada</span></div></div></section>
-</main></div>
+    <section class="simple-options" aria-label="Opções de atendimento">
+      <article class="simple-card simple-products">
+        <span class="simple-icon" aria-hidden="true">◇</span>
+        <h2>Produtos</h2>
+        <p>O catálogo ainda não está publicado. Pergunte à equipe sobre os produtos disponíveis.</p>
+        <a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quais%20produtos%20est%C3%A3o%20dispon%C3%ADveis%3F" target="_blank" rel="noopener noreferrer">Perguntar sobre produtos <span aria-hidden="true">↗</span></a>
+      </article>
+      <article class="simple-card">
+        <span class="simple-icon" aria-hidden="true">⌕</span>
+        <h2>Acompanhar reparo</h2>
+        <p>A consulta online ainda não está disponível. Fale com a equipe sobre seu reparo.</p>
+        <a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20gostaria%20de%20consultar%20meu%20reparo.%20Como%20posso%20prosseguir%3F" target="_blank" rel="noopener noreferrer">Perguntar sobre meu reparo <span aria-hidden="true">↗</span></a>
+      </article>
+      <article class="simple-card">
+        <span class="simple-icon" aria-hidden="true">✧</span>
+        <h2>Garantia</h2>
+        <p>Confirme com a equipe as condições de garantia do serviço realizado.</p>
+        <a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20tenho%20uma%20d%C3%BAvida%20sobre%20a%20garantia%20do%20meu%20servi%C3%A7o." target="_blank" rel="noopener noreferrer">Perguntar sobre garantia <span aria-hidden="true">↗</span></a>
+      </article>
+    </section>
 
-<div id="modal" class="modal"><div class="modalbox"><div class="top"><h2 id="modalTitle">OS</h2><button class="btn2" onclick="closeModal()">Fechar</button></div><div id="modalBody"></div></div></div>
-<script>
-const STORAGE="aguiaRepairOS_v3";
-let orders=JSON.parse(localStorage.getItem(STORAGE)||"null")||[
-{id:1042,client:"João Silva",phone:"(27) 99999-0000",brand:"Apple",model:"iPhone 13",problem:"Troca de tela",status:"Pronto"},
-{id:1041,client:"Maria Souza",phone:"(33) 98888-1111",brand:"Samsung",model:"Galaxy A54",problem:"Não liga",status:"Em reparo"},
-{id:1040,client:"Carlos Lima",phone:"(27) 97777-2222",brand:"Motorola",model:"Moto G84",problem:"Conector",status:"Diagnóstico"},
-{id:1039,client:"Ana Paula",phone:"(27) 96666-3333",brand:"Apple",model:"iPhone 11",problem:"Bateria",status:"Aguardando aprovação"},
-{id:1038,client:"Pedro Alves",phone:"(33) 95555-4444",brand:"Apple",model:"iPhone XR",problem:"Placa",status:"Em reparo"},
-{id:1037,client:"Lucas",phone:"(27) 94444-5555",brand:"Xiaomi",model:"Redmi Note 12",problem:"Conector",status:"Entregue"}
-];
-function persist(){localStorage.setItem(STORAGE,JSON.stringify(orders));}
-const statuses=["Diagnóstico","Aguardando aprovação","Em reparo","Pronto","Entregue"];
-function toggleMenu(){document.querySelector(".side").classList.toggle("open");document.getElementById("menuOverlay").classList.toggle("show")}
-function showPage(id,btn){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));if(btn)btn.classList.add("active");if(window.innerWidth<=900){document.querySelector(".side").classList.remove("open");document.getElementById("menuOverlay").classList.remove("show")}if(id==="orders")renderOrders();if(id==="clients")renderClients();window.scrollTo({top:0,behavior:"smooth"})}
-function renderRecent(){recent.innerHTML=orders.slice(0,7).map(o=>`<div class="row"><div><b>#${o.id} · ${o.client}</b><div class="muted">${o.brand||""} ${o.model} · ${o.problem}</div></div><span class="tag ${o.status==="Pronto"?"ok":o.status==="Em reparo"?"warn":"blue"}">${o.status}</span></div>`).join("")}
-function renderCounts(){
- received.textContent=orders.filter(o=>o.status==="Recebido").length;
- const diag=document.querySelectorAll('.card .num')[1]; if(diag)diag.textContent=orders.filter(o=>o.status==="Diagnóstico").length;
- const rep=document.querySelectorAll('.card .num')[2]; if(rep)rep.textContent=orders.filter(o=>o.status==="Em reparo").length;
- const ready=document.querySelectorAll('.card .num')[3]; if(ready)ready.textContent=orders.filter(o=>o.status==="Pronto").length;
-}
-function renderOrders(){let q=(document.getElementById("search")?.value||"").toLowerCase();let list=orders.filter(o=>`${o.id} ${o.client} ${o.model} ${o.problem}`.toLowerCase().includes(q));pipeline.innerHTML=statuses.map(s=>`<div class="column"><h3>${s.toUpperCase()}</h3>${list.filter(o=>o.status===s).map(o=>`<div class="ticket" onclick="openOS(${o.id})"><b>#${o.id} · ${o.client}</b><p class="muted">${o.brand||""} ${o.model}</p><p class="muted">${o.problem}</p></div>`).join("")||'<div class="muted">Nenhuma OS</div>'}</div>`).join("")}
-function renderClients(){let map={};orders.forEach(o=>{if(!map[o.client])map[o.client]={count:0,phone:o.phone};map[o.client].count++});clientsList.innerHTML=Object.entries(map).map(([n,c])=>`<div class="row"><div><b>${n}</b><div class="muted">${c.phone||""} · ${c.count} OS</div></div><span class="tag">Histórico</span></div>`).join("")}
-function nextId(){return Math.max(1000,...orders.map(o=>Number(o.id)||0))+1}
-function createOS(){
- if(!osForm.reportValidity())return;
- let id=nextId();
- orders.unshift({id,client:client.value.trim(),phone:phone.value.trim(),brand:brand.value.trim(),model:model.value.trim(),color:color.value.trim(),system:system.value,lock:lock.value,password:password.value,pattern:patternData,problem:problem.value.trim(),condition:condition.value.trim(),accessories:accessories.value.trim(),notes:notes.value.trim(),status:"Diagnóstico",createdAt:new Date().toISOString()});
- persist(); osForm.reset(); clearPattern(); renderCounts(); renderRecent(); renderOrders(); renderClients(); showPage("orders"); alert("OS #"+id+" criada com sucesso.");
-}
-function openOS(id){let o=orders.find(x=>x.id===id);if(!o)return;modalTitle.textContent="OS #"+o.id+" · "+o.client;modalBody.innerHTML=`<div class="row"><span>WhatsApp</span><b>${o.phone||"-"}</b></div><div class="row"><span>Aparelho</span><b>${o.brand||""} ${o.model}</b></div><div class="row"><span>Cor</span><b>${o.color||"-"}</b></div><div class="row"><span>Sistema</span><b>${o.system||"-"}</b></div><div class="row"><span>Problema</span><b>${o.problem}</b></div><div class="row"><span>Estado físico</span><b>${o.condition||"-"}</b></div><div class="row"><span>Acessórios</span><b>${o.accessories||"-"}</b></div><div class="row"><span>Status</span><select id="newStatus">${["Recebido",...statuses].map(s=>`<option ${s===o.status?"selected":""}>${s}</option>`).join("")}</select></div><div class="actions"><button class="btn" onclick="saveStatus(${id})">Salvar status</button></div>`;modal.classList.add("show")}
-function saveStatus(id){orders.find(x=>x.id===id).status=newStatus.value;persist();closeModal();renderCounts();renderRecent();renderOrders()}
-function closeModal(){modal.classList.remove("show")}
+    <p class="simple-note">Consultas online ainda estão em preparação. Os links abrem o WhatsApp com uma mensagem pronta; nada é enviado sem sua confirmação.</p>
+    <section class="simple-contact" aria-label="Contato da Águia Repair">
+      <span class="contact-heading">Fale com a gente</span>
+      <a href="https://wa.me/5527998784657" target="_blank" rel="noopener noreferrer"><span class="contact-name">WhatsApp</span><strong>(27) 99878-4657</strong><span aria-hidden="true">↗</span></a>
+      <a href="https://www.instagram.com/aguiarepair/" target="_blank" rel="noopener noreferrer"><span class="contact-name">Instagram</span><strong>@aguiarepair</strong><span aria-hidden="true">↗</span></a>
+    </section>
+  </main>
 
-let patternData="";
-function initPattern(){const c=document.getElementById("patternCanvas");if(!c)return;const ctx=c.getContext("2d");let drawing=false;let pts=[];function resize(){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);draw()}function pos(e){const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}function draw(){const r=c.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);ctx.fillStyle="#777";for(let y=1;y<=3;y++)for(let x=1;x<=3;x++){ctx.beginPath();ctx.arc(r.width*x/4,r.height*y/4,7,0,Math.PI*2);ctx.fill()}if(pts.length){ctx.strokeStyle="#d4a017";ctx.lineWidth=3;ctx.lineCap="round";ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke()}}function update(){patternData=pts.map(p=>Math.round(p.x)+","+Math.round(p.y)).join(";")}c.addEventListener("pointerdown",e=>{drawing=true;pts=[pos(e)];c.setPointerCapture(e.pointerId);update();draw()});c.addEventListener("pointermove",e=>{if(!drawing)return;pts.push(pos(e));update();draw()});c.addEventListener("pointerup",()=>drawing=false);c.addEventListener("pointercancel",()=>drawing=false);window.addEventListener("resize",resize);setTimeout(resize,50);window.clearPattern=()=>{pts=[];patternData="";draw()}}
-initPattern();renderCounts();renderRecent();renderOrders();renderClients();
-</script>
-</body></html>
+  <footer class="simple-footer wrap">
+    <span>ÁGUIA REPAIR</span>
+    <span>Assistência técnica & microeletrônica</span>
+  </footer>
+</body>
+</html>
