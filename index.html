@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="assets/site.css">
   <link rel="stylesheet" href="assets/portal.css">
   <script src="assets/supabase-config.js" defer></script>
-  <script src="assets/public-portal.js?v=3" defer></script>
+  <script src="assets/public-portal.js?v=4" defer></script>
 </head>
 <body class="simple-home">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
@@ -37,6 +37,11 @@
     <section id="produtos" class="portal-section" aria-labelledby="products-heading">
       <div class="portal-section-heading"><div><p class="eyebrow">CATÁLOGO ÁGUIA REPAIR</p><h2 id="products-heading">Produtos</h2></div><a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quero%20saber%20quais%20produtos%20est%C3%A3o%20dispon%C3%ADveis." target="_blank" rel="noopener noreferrer">Perguntar no WhatsApp <span aria-hidden="true">↗</span></a></div>
       <div id="catalog-grid" class="catalog-grid" aria-live="polite"><p class="catalog-empty">O catálogo está sendo conectado. Se precisar, fale com a equipe pelo WhatsApp.</p></div>
+      <section id="shopping-cart" class="shopping-cart" aria-labelledby="cart-heading">
+        <div class="cart-heading"><div><p class="eyebrow">SEU PEDIDO</p><h3 id="cart-heading">Carrinho</h3></div><span id="cart-count" class="cart-count">0 itens</span></div>
+        <div id="cart-items" class="cart-items" aria-live="polite"><p class="cart-empty">Seu carrinho está vazio.</p></div>
+        <div class="cart-footer"><div><strong id="cart-total">Total: R$ 0,00</strong><p>Disponibilidade, preço e entrega serão confirmados pelo WhatsApp.</p></div><button id="checkout-whatsapp" class="simple-primary" type="button" disabled>Continuar pelo WhatsApp <span aria-hidden="true">↗</span></button></div>
+      </section>
     </section>
 
     <section id="consulta-os" class="portal-section portal-query" aria-labelledby="os-heading">

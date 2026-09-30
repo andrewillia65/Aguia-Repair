@@ -4,7 +4,11 @@
   const baseUrl = typeof config.url === "string" ? config.url.replace(/\/$/, "") : "";
   const publishableKey = typeof config.publishableKey === "string" ? config.publishableKey : "";
   const isConfigured = Boolean(baseUrl && publishableKey);
+  const cartStorageKey = "aguia-repair-cart-v1";
+  const storeWhatsApp = "5527998784657";
   let quoteCredentials = null;
+  let catalogById = new Map();
+  let cartQuantities = loadCart();
 
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -15,6 +19,92 @@
     element.classList.toggle("lookup-error", isError);
     element.textContent = message;
   };
+
+  function loadCart() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(cartStorageKey) || "[]");
+      if (!Array.isArray(saved)) return new Map();
+      return new Map(saved.filter(row => row && typeof row.id === "string" && Number.isInteger(row.quantity) && row.quantity > 0 && row.quantity <= 99)
+        .map(row => [row.id, row.quantity]));
+    } catch { return new Map(); }
+  }
+
+  function saveCart() {
+    try {
+      localStorage.setItem(cartStorageKey, JSON.stringify(Array.from(cartQuantities, ([id, quantity]) => ({ id, quantity }))));
+    } catch { /* The cart still works for this page view if storage is unavailable. */ }
+  }
+
+  function formatMoney(value) {
+    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+  }
+
+  function renderCart() {
+    const cartItemsElement = document.querySelector("#cart-items");
+    const cartCount = document.querySelector("#cart-count");
+    const cartTotal = document.querySelector("#cart-total");
+    const checkout = document.querySelector("#checkout-whatsapp");
+    if (!cartItemsElement || !cartCount || !cartTotal || !checkout) return;
+
+    const entries = Array.from(cartQuantities, ([id, quantity]) => ({ item: catalogById.get(id), quantity }))
+      .filter(entry => entry.item);
+    const totalQuantity = entries.reduce((sum, entry) => sum + entry.quantity, 0);
+    const hasUnpricedItems = entries.some(({ item }) => item.price === null || item.price === "");
+    const subtotal = entries.reduce((sum, { item, quantity }) => sum + (item.price === null || item.price === "" ? 0 : Number(item.price) * quantity), 0);
+    cartCount.textContent = `${totalQuantity} ${totalQuantity === 1 ? "item" : "itens"}`;
+    cartTotal.textContent = hasUnpricedItems ? `Subtotal informado: ${formatMoney(subtotal)} · há preço a confirmar` : `Total: ${formatMoney(subtotal)}`;
+    checkout.disabled = entries.length === 0;
+
+    if (!entries.length) {
+      cartItemsElement.innerHTML = '<p class="cart-empty">Seu carrinho está vazio.</p>';
+      return;
+    }
+    cartItemsElement.innerHTML = entries.map(({ item, quantity }) => {
+      const priceText = item.price === null || item.price === ""
+        ? "Preço a confirmar"
+        : `${quantity} × ${formatMoney(Number(item.price))} = ${formatMoney(Number(item.price) * quantity)}`;
+      return `<div class="cart-row"><div><div class="cart-item-title">${escapeHtml(item.name)}</div><p class="cart-item-price">${priceText}</p></div><div class="cart-controls"><button type="button" data-cart-action="decrease" data-cart-id="${escapeHtml(item.id)}" aria-label="Diminuir ${escapeHtml(item.name)}">−</button><span>${quantity}</span><button type="button" data-cart-action="increase" data-cart-id="${escapeHtml(item.id)}" aria-label="Aumentar ${escapeHtml(item.name)}">+</button><button class="cart-remove" type="button" data-cart-action="remove" data-cart-id="${escapeHtml(item.id)}" aria-label="Remover ${escapeHtml(item.name)}">Remover</button></div></div>`;
+    }).join("");
+  }
+
+  function setupCart() {
+    const grid = document.querySelector("#catalog-grid");
+    const cartItemsElement = document.querySelector("#cart-items");
+    const checkout = document.querySelector("#checkout-whatsapp");
+    grid?.addEventListener("click", event => {
+      const button = event.target.closest("[data-cart-add]");
+      if (!button) return;
+      const id = button.dataset.cartAdd;
+      if (!catalogById.has(id)) return;
+      cartQuantities.set(id, Math.min(99, (cartQuantities.get(id) || 0) + 1));
+      saveCart();
+      renderCart();
+    });
+    cartItemsElement?.addEventListener("click", event => {
+      const button = event.target.closest("[data-cart-action]");
+      if (!button) return;
+      const id = button.dataset.cartId;
+      const quantity = cartQuantities.get(id) || 0;
+      if (button.dataset.cartAction === "remove" || (button.dataset.cartAction === "decrease" && quantity <= 1)) cartQuantities.delete(id);
+      else if (button.dataset.cartAction === "decrease") cartQuantities.set(id, quantity - 1);
+      else if (button.dataset.cartAction === "increase") cartQuantities.set(id, Math.min(99, quantity + 1));
+      saveCart();
+      renderCart();
+    });
+    checkout?.addEventListener("click", () => {
+      const entries = Array.from(cartQuantities, ([id, quantity]) => ({ item: catalogById.get(id), quantity }))
+        .filter(entry => entry.item);
+      if (!entries.length) return;
+      const hasUnpricedItems = entries.some(({ item }) => item.price === null || item.price === "");
+      const subtotal = entries.reduce((sum, { item, quantity }) => sum + (item.price === null || item.price === "" ? 0 : Number(item.price) * quantity), 0);
+      const lines = ["Olá! Quero pedir pelo site da Águia Repair:", "", ...entries.map(({ item, quantity }) => {
+        const lineTotal = item.price === null || item.price === "" ? "preço a confirmar" : formatMoney(Number(item.price) * quantity);
+        return `• ${item.name} — ${quantity} un. — ${lineTotal}`;
+      }), "", hasUnpricedItems ? `Subtotal dos itens com preço informado: ${formatMoney(subtotal)}. Há preço(s) a confirmar.` : `Total dos produtos: ${formatMoney(subtotal)}.`, "Por favor, confirme disponibilidade e combine a entrega/retirada."];
+      window.location.href = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(lines.join("\n"))}`;
+    });
+    renderCart();
+  }
 
   async function loadCatalog() {
     const grid = document.querySelector("#catalog-grid");
@@ -32,14 +122,20 @@
       if (!response.ok) throw new Error("catalog_unavailable");
       const items = await response.json();
       if (!items.length) {
+        catalogById = new Map();
+        renderCart();
         grid.innerHTML = '<p class="catalog-empty">Ainda não há produtos publicados. <a href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quero%20saber%20quais%20produtos%20est%C3%A3o%20dispon%C3%ADveis." target="_blank" rel="noopener noreferrer">Pergunte à equipe pelo WhatsApp ↗</a></p>';
         return;
       }
+      catalogById = new Map(items.map(item => [String(item.id), item]));
+      cartQuantities = new Map(Array.from(cartQuantities).filter(([id]) => catalogById.has(id)));
+      saveCart();
       grid.innerHTML = items.map(item => {
         const image = item.image_url ? `<img src="${escapeHtml(item.image_url)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : "";
-        const price = item.price === null ? "" : `<p class="catalog-price">${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(item.price))}</p>`;
-        return `<article class="catalog-card">${image}<div class="catalog-card-body"><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.description)}</p>${price}</div></article>`;
+        const price = item.price === null ? '<p class="catalog-price">Consulte o preço</p>' : `<p class="catalog-price">${formatMoney(Number(item.price))}</p>`;
+        return `<article class="catalog-card">${image}<div class="catalog-card-body"><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.description)}</p>${price}<button class="cart-add-button" type="button" data-cart-add="${escapeHtml(item.id)}" aria-label="Adicionar ${escapeHtml(item.name)} ao carrinho">Adicionar ao carrinho</button></div></article>`;
       }).join("");
+      renderCart();
     } catch {
       grid.innerHTML = '<p class="catalog-empty">O catálogo está temporariamente indisponível. <a href="https://wa.me/5527998784657" target="_blank" rel="noopener noreferrer">Fale com a equipe ↗</a></p>';
     }
@@ -136,6 +232,7 @@
   });
 
   loadCatalog();
+  setupCart();
   setupLookup("order-lookup-form", "order-result", "order");
   setupLookup("warranty-lookup-form", "warranty-result", "warranty");
 })();
