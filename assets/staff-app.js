@@ -14,6 +14,7 @@
     return token;
   })();
   let session = null;
+  let sessionExpiresAt = 0;
   let staff = null;
   let refreshTimer = 0;
   const statusLabels = {
@@ -193,16 +194,21 @@
   }
 
   async function authRequest(path, body, token) {
-    const response = await fetch(baseUrl + path, {
-      method: body ? "POST" : "GET",
-      headers: {
-        apikey: publishableKey,
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: "Bearer " + token } : {})
-      },
-      body: body ? JSON.stringify(body) : undefined,
-      cache: "no-store"
-    });
+    let response;
+    try {
+      response = await fetch(baseUrl + path, {
+        method: body ? "POST" : "GET",
+        headers: {
+          apikey: publishableKey,
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: "Bearer " + token } : {})
+        },
+        body: body ? JSON.stringify(body) : undefined,
+        cache: "no-store"
+      });
+    } catch {
+      throw new Error("Não foi possível conectar ao Supabase. Confira sua internet e tente novamente.");
+    }
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       const error = new Error(data.msg || data.message || "Não foi possível autenticar.");
@@ -210,6 +216,15 @@
       throw error;
     }
     return data;
+  }
+
+  function setSession(nextSession) {
+    session = nextSession;
+    const absoluteExpiry = Number(nextSession?.expires_at || 0);
+    const expiresIn = Number(nextSession?.expires_in || 0);
+    sessionExpiresAt = absoluteExpiry > 0
+      ? absoluteExpiry * 1000
+      : expiresIn > 0 ? Date.now() + expiresIn * 1000 : 0;
   }
 
   function saveRememberedSession(remember) {
@@ -256,6 +271,31 @@
     } catch { /* The active session can continue even if browser storage is unavailable. */ }
   }
 
+  async function refreshActiveSession() {
+    if (!session?.refresh_token) throw new Error("Entre novamente na área da equipe.");
+    const refreshed = await authRequest("/auth/v1/token?grant_type=refresh_token", {
+      refresh_token: session.refresh_token
+    });
+    if (!refreshed.access_token || !refreshed.user?.id) throw new Error("Não foi possível renovar sua sessão.");
+    setSession(refreshed);
+    syncRememberedRefreshToken();
+    armRefresh();
+  }
+
+  async function ensureFreshSession() {
+    if (!session?.refresh_token || !sessionExpiresAt || sessionExpiresAt > Date.now() + 120_000) return;
+    try {
+      await refreshActiveSession();
+    } catch (error) {
+      if (error.status === 400 || error.status === 401) {
+        clearSession(true);
+        showLogin("Sua sessão expirou. Entre novamente para continuar.", true);
+        throw new Error("Sua sessão expirou. Entre novamente na área da equipe.");
+      }
+      throw error;
+    }
+  }
+
   async function restoreRememberedSession() {
     if (!configured || inviteAccessToken) return;
     let refreshToken = "";
@@ -265,7 +305,7 @@
 
     message("staff-login-message", "Restaurando seu acesso...");
     try {
-      session = await authRequest("/auth/v1/token?grant_type=refresh_token", { refresh_token: refreshToken });
+      setSession(await authRequest("/auth/v1/token?grant_type=refresh_token", { refresh_token: refreshToken }));
       if (!session.access_token || !session.user?.id) throw new Error("A sessão salva não é válida.");
       syncRememberedRefreshToken();
       const profiles = await getRows("staff_profiles", {
@@ -295,18 +335,18 @@
 
   function armRefresh() {
     window.clearTimeout(refreshTimer);
-    if (!session?.refresh_token || !session?.expires_in) return;
-    const wait = Math.max(30000, (Number(session.expires_in) - 60) * 1000);
+    if (!session?.refresh_token || !sessionExpiresAt) return;
+    const wait = Math.max(30000, sessionExpiresAt - Date.now() - 120000);
     refreshTimer = window.setTimeout(async () => {
       try {
-        session = await authRequest("/auth/v1/token?grant_type=refresh_token", { refresh_token: session.refresh_token });
-        syncRememberedRefreshToken();
-        armRefresh();
+        await refreshActiveSession();
       } catch (error) {
-        clearSession(error.status === 400 || error.status === 401);
-        showLogin(error.status === 400 || error.status === 401
-          ? "Sua sessão expirou. Entre novamente."
-          : "Não foi possível renovar a sessão. Tente entrar novamente.", true);
+        if (error.status === 400 || error.status === 401) {
+          clearSession(true);
+          showLogin("Sua sessão expirou. Entre novamente.", true);
+        } else {
+          message("staff-global-message", "Não foi possível renovar a sessão agora. Confira sua internet e tente novamente.", true);
+        }
       }
     }, wait);
   }
@@ -314,6 +354,7 @@
   function clearSession(forgetRemembered = false) {
     window.clearTimeout(refreshTimer);
     session = null;
+    sessionExpiresAt = 0;
     staff = null;
     if (forgetRemembered) {
       try { window.localStorage.removeItem(rememberedSessionKey); } catch { /* Ignore unavailable storage. */ }
@@ -355,7 +396,7 @@
   async function login(email, password, remember, rememberEmail) {
     const data = await authRequest("/auth/v1/token?grant_type=password", { email, password });
     if (!data.access_token || !data.user?.id) throw new Error("Conta ou senha inválida.");
-    session = data;
+    setSession(data);
     armRefresh();
     const profiles = await getRows("staff_profiles", {
       select: "user_id,display_name,role,active",
@@ -387,6 +428,7 @@
 
   async function api(path, options = {}) {
     if (!configured) throw new Error("Conexão com o banco ainda não foi configurada.");
+    await ensureFreshSession();
     const headers = {
       apikey: publishableKey,
       Accept: "application/json",
@@ -394,12 +436,21 @@
       ...(options.headers || {}),
       ...(options.body ? { "Content-Type": "application/json", Prefer: options.prefer || "return=representation" } : {})
     };
-    const response = await fetch(baseUrl + path, {
-      method: options.method || "GET",
-      headers,
-      body: options.body ? JSON.stringify(options.body) : undefined,
-      cache: "no-store"
-    });
+    let response;
+    try {
+      response = await fetch(baseUrl + path, {
+        method: options.method || "GET",
+        headers,
+        body: options.body ? JSON.stringify(options.body) : undefined,
+        cache: "no-store"
+      });
+    } catch {
+      throw new Error("Falha ao conectar ao serviço. Confira sua internet e abra o site por https://aguiarepair.com.br; depois, tente novamente.");
+    }
+    if (response.status === 401 && session?.refresh_token && !options._retriedAfterRefresh) {
+      await refreshActiveSession();
+      return api(path, { ...options, _retriedAfterRefresh: true });
+    }
     const text = await response.text();
     let data = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = text; }
@@ -424,8 +475,7 @@
     if (!session?.access_token) throw new Error("Entre novamente para continuar.");
     return api("/functions/v1/" + name, {
       method: "POST",
-      body,
-      headers: { Authorization: "Bearer " + session.access_token }
+      body
     });
   }
 
