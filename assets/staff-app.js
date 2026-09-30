@@ -5,6 +5,7 @@
   const publishableKey = typeof config.publishableKey === "string" ? config.publishableKey : "";
   const configured = Boolean(baseUrl && publishableKey);
   const rememberedSessionKey = "aguiarp.staff.refresh.v1";
+  const rememberedEmailKey = "aguiarp.staff.email.v1";
   const inviteAccessToken = (() => {
     const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     if (fragment.get("type") !== "invite" || !fragment.has("access_token")) return "";
@@ -224,6 +225,29 @@
     }
   }
 
+  function saveRememberedEmail(remember, email = "") {
+    try {
+      if (remember && email) {
+        window.localStorage.setItem(rememberedEmailKey, email.trim().toLowerCase());
+      } else {
+        window.localStorage.removeItem(rememberedEmailKey);
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function restoreRememberedEmail() {
+    const form = $("#staff-login-form");
+    if (!form) return;
+    try {
+      const email = window.localStorage.getItem(rememberedEmailKey) || "";
+      form.elements.namedItem("email").value = email;
+      form.elements.namedItem("rememberEmail").checked = Boolean(email);
+    } catch { /* The user can still enter their email manually. */ }
+  }
+
   function syncRememberedRefreshToken() {
     try {
       if (window.localStorage.getItem(rememberedSessionKey) && session?.refresh_token) {
@@ -328,7 +352,7 @@
     activateScreen("overview");
   }
 
-  async function login(email, password, remember) {
+  async function login(email, password, remember, rememberEmail) {
     const data = await authRequest("/auth/v1/token?grant_type=password", { email, password });
     if (!data.access_token || !data.user?.id) throw new Error("Conta ou senha inválida.");
     session = data;
@@ -343,9 +367,11 @@
       throw new Error("Esta conta não tem acesso ativo à gestão. Peça ajuda à administração.");
     }
     staff = profiles[0];
-    const saved = saveRememberedSession(remember);
+    const savedSession = saveRememberedSession(remember);
+    const savedEmail = saveRememberedEmail(rememberEmail, email);
     showDashboard();
-    if (!saved) message("staff-global-message", "Não foi possível salvar a sessão neste navegador. Você precisará entrar novamente ao voltar.", true);
+    if (!savedSession) message("staff-global-message", "Não foi possível salvar a sessão neste navegador. Você precisará entrar novamente ao voltar.", true);
+    else if (rememberEmail && !savedEmail) message("staff-global-message", "Não foi possível lembrar seu e-mail neste navegador.", true);
   }
 
   async function logout() {
@@ -355,6 +381,7 @@
     } catch { /* The local session is cleared even if the remote endpoint is unavailable. */ }
     clearSession(true);
     $("#staff-login-form").reset();
+    restoreRememberedEmail();
     showLogin("Você saiu da área da equipe.");
   }
 
@@ -854,7 +881,12 @@
     button.disabled = true;
     message("staff-login-message", "Conectando...");
     try {
-      await login(String(data.get("email")).trim(), String(data.get("password")), data.get("remember") === "on");
+      await login(
+        String(data.get("email")).trim(),
+        String(data.get("password")),
+        data.get("remember") === "on",
+        data.get("rememberEmail") === "on"
+      );
     } catch (error) {
       clearSession(true);
       showLogin(error.message || "Não foi possível entrar.", true);
@@ -863,6 +895,10 @@
       const password = form.elements.namedItem("password");
       if (password) password.value = "";
     }
+  });
+
+  $("#staff-login-form")?.elements.namedItem("rememberEmail")?.addEventListener("change", event => {
+    if (!event.currentTarget.checked) saveRememberedEmail(false);
   });
 
   $("#staff-invite-form")?.addEventListener("submit", async event => {
@@ -958,8 +994,10 @@
     if (configured) showInviteSetup();
     else showLogin("Banco ainda não conectado.", true);
   } else if (!configured) {
+    restoreRememberedEmail();
     showLogin("Banco ainda não conectado.", true);
   } else {
+    restoreRememberedEmail();
     void restoreRememberedSession();
   }
 })();

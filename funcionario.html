@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/staff.css">
   <script src="assets/supabase-config.js" defer></script>
   <script src="assets/device-catalog.js" defer></script>
-  <script src="assets/staff-app.js" defer></script>
+  <script src="assets/staff-app.js?v=2" defer></script>
 </head>
 <body class="simple-home staff-page">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
@@ -36,10 +36,11 @@
         <label>E-mail<input name="email" type="email" autocomplete="username" required maxlength="200"></label>
         <label>Senha<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
         <label class="staff-checkbox"><input name="remember" type="checkbox" checked> Manter conectado neste dispositivo</label>
+        <label class="staff-checkbox"><input name="rememberEmail" type="checkbox"> Lembrar meu e-mail neste dispositivo</label>
         <button class="simple-primary" type="submit">Entrar <span aria-hidden="true">↗</span></button>
         <p id="staff-login-message" class="staff-message" role="status" aria-live="polite"></p>
       </form>
-      <p class="staff-footnote">Não existe cadastro público. A senha nunca é salva; desmarque a opção em computadores compartilhados.</p>
+      <p class="staff-footnote">Não existe cadastro público. A senha nunca é salva; desmarque as opções em computadores compartilhados.</p>
     </section>
 
     <section id="staff-dashboard" class="staff-dashboard" hidden aria-label="Painel da equipe">
