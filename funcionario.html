@@ -34,10 +34,11 @@
       <form id="staff-login-form" class="staff-form">
         <label>E-mail<input name="email" type="email" autocomplete="username" required maxlength="200"></label>
         <label>Senha<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
+        <label class="staff-checkbox"><input name="remember" type="checkbox" checked> Manter conectado neste dispositivo</label>
         <button class="simple-primary" type="submit">Entrar <span aria-hidden="true">↗</span></button>
         <p id="staff-login-message" class="staff-message" role="status" aria-live="polite"></p>
       </form>
-      <p class="staff-footnote">Não existe cadastro público. A senha e a sessão não são gravadas no armazenamento do navegador.</p>
+      <p class="staff-footnote">Não existe cadastro público. A senha nunca é salva; desmarque a opção em computadores compartilhados.</p>
     </section>
 
     <section id="staff-dashboard" class="staff-dashboard" hidden aria-label="Painel da equipe">

@@ -4,6 +4,7 @@
   const baseUrl = typeof config.url === "string" ? config.url.replace(/\/$/, "") : "";
   const publishableKey = typeof config.publishableKey === "string" ? config.publishableKey : "";
   const configured = Boolean(baseUrl && publishableKey);
+  const rememberedSessionKey = "aguiarp.staff.refresh.v1";
   const inviteAccessToken = (() => {
     const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     if (fragment.get("type") !== "invite" || !fragment.has("access_token")) return "";
@@ -62,8 +63,70 @@
       cache: "no-store"
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.msg || data.message || "Não foi possível autenticar.");
+    if (!response.ok) {
+      const error = new Error(data.msg || data.message || "Não foi possível autenticar.");
+      error.status = response.status;
+      throw error;
+    }
     return data;
+  }
+
+  function saveRememberedSession(remember) {
+    try {
+      if (remember && session?.refresh_token) {
+        window.localStorage.setItem(rememberedSessionKey, session.refresh_token);
+      } else {
+        window.localStorage.removeItem(rememberedSessionKey);
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function syncRememberedRefreshToken() {
+    try {
+      if (window.localStorage.getItem(rememberedSessionKey) && session?.refresh_token) {
+        window.localStorage.setItem(rememberedSessionKey, session.refresh_token);
+      }
+    } catch { /* The active session can continue even if browser storage is unavailable. */ }
+  }
+
+  async function restoreRememberedSession() {
+    if (!configured || inviteAccessToken) return;
+    let refreshToken = "";
+    try { refreshToken = window.localStorage.getItem(rememberedSessionKey) || ""; }
+    catch { return; }
+    if (!refreshToken) return;
+
+    message("staff-login-message", "Restaurando seu acesso...");
+    try {
+      session = await authRequest("/auth/v1/token?grant_type=refresh_token", { refresh_token: refreshToken });
+      if (!session.access_token || !session.user?.id) throw new Error("A sessão salva não é válida.");
+      syncRememberedRefreshToken();
+      const profiles = await getRows("staff_profiles", {
+        select: "user_id,display_name,role,active",
+        user_id: "eq." + session.user.id,
+        limit: "1"
+      });
+      if (!profiles[0]?.active) {
+        clearSession(true);
+        showLogin("Esta conta não tem acesso ativo à gestão. Peça ajuda à administração.", true);
+        return;
+      }
+      staff = profiles[0];
+      syncRememberedRefreshToken();
+      armRefresh();
+      showDashboard();
+    } catch (error) {
+      window.clearTimeout(refreshTimer);
+      session = null;
+      staff = null;
+      if (error.status === 400 || error.status === 401) clearSession(true);
+      showLogin(error.status === 400 || error.status === 401
+        ? "Sua sessão expirou. Entre novamente para manter o acesso neste dispositivo."
+        : "Não foi possível restaurar a sessão agora. Entre novamente ou tente mais tarde.", true);
+    }
   }
 
   function armRefresh() {
@@ -73,18 +136,24 @@
     refreshTimer = window.setTimeout(async () => {
       try {
         session = await authRequest("/auth/v1/token?grant_type=refresh_token", { refresh_token: session.refresh_token });
+        syncRememberedRefreshToken();
         armRefresh();
-      } catch {
-        clearSession();
-        showLogin("Sua sessão expirou. Entre novamente.", true);
+      } catch (error) {
+        clearSession(error.status === 400 || error.status === 401);
+        showLogin(error.status === 400 || error.status === 401
+          ? "Sua sessão expirou. Entre novamente."
+          : "Não foi possível renovar a sessão. Tente entrar novamente.", true);
       }
     }, wait);
   }
 
-  function clearSession() {
+  function clearSession(forgetRemembered = false) {
     window.clearTimeout(refreshTimer);
     session = null;
     staff = null;
+    if (forgetRemembered) {
+      try { window.localStorage.removeItem(rememberedSessionKey); } catch { /* Ignore unavailable storage. */ }
+    }
   }
 
   function showLogin(text = "", error = false) {
@@ -119,7 +188,7 @@
     activateScreen("overview");
   }
 
-  async function login(email, password) {
+  async function login(email, password, remember) {
     const data = await authRequest("/auth/v1/token?grant_type=password", { email, password });
     if (!data.access_token || !data.user?.id) throw new Error("Conta ou senha inválida.");
     session = data;
@@ -130,11 +199,13 @@
       limit: "1"
     });
     if (!profiles[0]?.active) {
-      clearSession();
+      clearSession(true);
       throw new Error("Esta conta não tem acesso ativo à gestão. Peça ajuda à administração.");
     }
     staff = profiles[0];
+    const saved = saveRememberedSession(remember);
     showDashboard();
+    if (!saved) message("staff-global-message", "Não foi possível salvar a sessão neste navegador. Você precisará entrar novamente ao voltar.", true);
   }
 
   async function logout() {
@@ -142,7 +213,7 @@
     try {
       if (token && configured) await authRequest("/auth/v1/logout", {}, token);
     } catch { /* The local session is cleared even if the remote endpoint is unavailable. */ }
-    clearSession();
+    clearSession(true);
     $("#staff-login-form").reset();
     showLogin("Você saiu da área da equipe.");
   }
@@ -205,22 +276,31 @@
 
   function orderRow(order, withAction) {
     const customer = order.customers?.name || "—";
+    const phone = String(order.customers?.whatsapp || "").replace(/\D/g, "");
+    const whatsappNumber = phone ? (phone.startsWith("55") ? phone : "55" + phone) : "";
     const statusCell = withAction
       ? '<select data-order-status data-order-id="' + esc(order.id) + '" aria-label="Alterar status da OS ' + esc(order.order_number) + '">' +
         Object.entries(statusLabels).map(([key, label]) => '<option value="' + key + '"' + (key === order.status ? " selected" : "") + ">" + esc(label) + "</option>").join("") + "</select>"
       : esc(statusLabels[order.status] || order.status);
+    const notifyCell = withAction && whatsappNumber
+      ? '<a class="staff-notify-link" href="https://wa.me/' + esc(whatsappNumber) + '?text=' + encodeURIComponent(
+          "Olá, " + customer + "! Aqui é da Águia Repair. A situação da sua OS " + order.order_number + " (" + [order.brand, order.model].filter(Boolean).join(" ") +
+          ") foi atualizada para: " + (statusLabels[order.status] || order.status) + ". " + (statusPublicNotes[order.status] || "") +
+          " Você pode acompanhar pelo site aguiarepair.com.br, em Acompanhar OS, usando o número e o código do comprovante."
+        ) + '" target="_blank" rel="noopener noreferrer">Avisar no WhatsApp ↗</a>'
+      : "—";
     return "<tr><td><strong>" + esc(order.order_number) + "</strong></td><td>" + esc(customer) +
       "</td><td>" + esc([order.brand, order.model].filter(Boolean).join(" ")) + "</td><td>" + statusCell +
-      "</td><td>" + esc(dateText(order.received_at)) + "</td></tr>";
+      "</td><td>" + esc(dateText(order.received_at)) + "</td><td>" + notifyCell + "</td></tr>";
   }
 
   async function loadOrders(target) {
     const rows = await getRows("work_orders", {
-      select: "id,order_number,status,brand,model,received_at,customers(name)",
+      select: "id,order_number,status,brand,model,received_at,customers(name,whatsapp)",
       order: "received_at.desc",
       limit: "100"
     });
-    const html = table(["OS", "Cliente", "Aparelho", "Status", "Entrada"], rows.map(row => orderRow(row, true)), "Nenhuma ordem de serviço cadastrada.");
+    const html = table(["OS", "Cliente", "Aparelho", "Status", "Entrada", "Aviso ao cliente"], rows.map(row => orderRow(row, true)), "Nenhuma ordem de serviço cadastrada.");
     target.innerHTML = html;
   }
 
@@ -563,9 +643,9 @@
     button.disabled = true;
     message("staff-login-message", "Conectando...");
     try {
-      await login(String(data.get("email")).trim(), String(data.get("password")));
+      await login(String(data.get("email")).trim(), String(data.get("password")), data.get("remember") === "on");
     } catch (error) {
-      clearSession();
+      clearSession(true);
       showLogin(error.message || "Não foi possível entrar.", true);
     } finally {
       button.disabled = false;
@@ -644,5 +724,7 @@
     else showLogin("Banco ainda não conectado.", true);
   } else if (!configured) {
     showLogin("Banco ainda não conectado.", true);
+  } else {
+    void restoreRememberedSession();
   }
 })();
