@@ -1,4 +1,4 @@
-import { corsHeaders, json, serviceClient, hmacHex, sha256, normalizeCode } from "../_shared/common.ts";
+import { corsHeaders, json, serviceClient, hmacHex, normalizePhoneLastFour } from "../_shared/common.ts";
 
 const labels: Record<string, string> = {
   received: "Recebido",
@@ -12,13 +12,6 @@ const labels: Record<string, string> = {
   delivered: "Entregue",
   cancelled: "Cancelado"
 };
-
-function constantTimeEqual(left: string, right: string): boolean {
-  if (left.length !== right.length) return false;
-  let diff = 0;
-  for (let i = 0; i < left.length; i++) diff |= left.charCodeAt(i) ^ right.charCodeAt(i);
-  return diff === 0;
-}
 
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
@@ -39,7 +32,7 @@ Deno.serve(async req => {
   } catch { return json(req, { error: "invalid_request" }, 400); }
   const type = input.type === "warranty" ? "warranty" : input.type === "order" ? "order" : "";
   const orderNumber = String(input.orderNumber ?? "").trim().toUpperCase();
-  const accessCode = normalizeCode(input.accessCode);
+  const whatsappLast4 = String(input.whatsappLast4 ?? "").replace(/\D/g, "");
   const standaloneWarranty = type === "warranty" && /^GAR-[0-9]{6,10}$/.test(orderNumber);
 
   const forwarded = req.headers.get("cf-connecting-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
@@ -48,18 +41,20 @@ Deno.serve(async req => {
   const { data: allowed, error: rateError } = await client.rpc("consume_public_lookup", { key_digest: rateKey });
   if (rateError || allowed !== true) return json(req, { error: "rate_limited" }, 429);
 
-  if (!type || (!standaloneWarranty && !/^AR-[0-9]{6,10}$/.test(orderNumber)) || accessCode.length !== 16) {
+  if (!type || (!standaloneWarranty && !/^AR-[0-9]{6,10}$/.test(orderNumber)) || !/^\d{4}$/.test(whatsappLast4)) {
     return json(req, { error: "not_found" }, 404);
   }
 
   try {
     if (standaloneWarranty) {
       const { data: warranty, error: warrantyError } = await client.from("warranties")
-        .select("warranty_number,public_code_hash,item_description,coverage_summary,starts_on,expires_on,status")
+        .select("warranty_number,customer_id,item_description,coverage_summary,starts_on,expires_on,status")
         .eq("warranty_number", orderNumber)
         .maybeSingle();
-      const suppliedHash = await sha256(accessCode);
-      if (warrantyError || !warranty?.public_code_hash || !constantTimeEqual(suppliedHash, warranty.public_code_hash)) {
+      const { data: customer, error: customerError } = warranty?.customer_id
+        ? await client.from("customers").select("whatsapp").eq("id", warranty.customer_id).maybeSingle()
+        : { data: null, error: null };
+      if (warrantyError || customerError || !warranty || normalizePhoneLastFour(customer?.whatsapp) !== whatsappLast4) {
         return json(req, { error: "not_found" }, 404);
       }
       const expired = warranty.status === "expired" || warranty.expires_on < new Date().toISOString().slice(0, 10);
@@ -74,11 +69,13 @@ Deno.serve(async req => {
     }
 
     const { data: order, error } = await client.from("work_orders")
-      .select("id,order_number,brand,model,color,storage_capacity,status,public_tracking_hash")
+      .select("id,customer_id,order_number,brand,model,color,storage_capacity,status")
       .eq("order_number", orderNumber)
       .maybeSingle();
-    const suppliedHash = await sha256(accessCode);
-    if (error || !order || !constantTimeEqual(suppliedHash, order.public_tracking_hash)) {
+    const { data: customer, error: customerError } = order
+      ? await client.from("customers").select("whatsapp").eq("id", order.customer_id).maybeSingle()
+      : { data: null, error: null };
+    if (error || customerError || !order || normalizePhoneLastFour(customer?.whatsapp) !== whatsappLast4) {
       return json(req, { error: "not_found" }, 404);
     }
 

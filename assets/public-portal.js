@@ -84,7 +84,7 @@
       const submit = form.querySelector("button[type=submit]");
       const fields = new FormData(form);
       const orderNumber = String(fields.get("orderNumber") || "").trim().toUpperCase();
-      const accessCode = String(fields.get("accessCode") || "").trim().replace(/\s+/g, "").toUpperCase();
+      const whatsappLast4 = String(fields.get("whatsappLast4") || "").replace(/\D/g, "");
       if (submit) { submit.disabled = true; submit.textContent = "Consultando…"; }
       setMessage(result, "");
       try {
@@ -92,12 +92,12 @@
           method: "POST",
           headers: { apikey: publishableKey, "Content-Type": "application/json" },
           cache: "no-store",
-          body: JSON.stringify({ type, orderNumber, accessCode })
+          body: JSON.stringify({ type, orderNumber, whatsappLast4 })
         });
         const payload = await response.json().catch(() => ({}));
         if (response.status === 429) throw new Error("Muitas tentativas. Aguarde alguns minutos e tente novamente.");
-        if (!response.ok) throw new Error("Confira o número da OS e o código do comprovante.");
-        if (type === "order" && payload.quote?.status === "sent") quoteCredentials = { orderNumber, accessCode };
+        if (!response.ok) throw new Error("Confira o número da OS ou garantia e os 4 últimos dígitos do WhatsApp cadastrado.");
+        if (type === "order" && payload.quote?.status === "sent") quoteCredentials = { orderNumber, whatsappLast4 };
         renderLookup(result, payload, type);
       } catch (error) {
         setMessage(result, `${error.message || "Não foi possível consultar agora."} Se precisar, fale com a equipe pelo WhatsApp.`, true);

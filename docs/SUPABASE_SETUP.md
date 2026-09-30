@@ -81,10 +81,10 @@ O UUID e o nome são dados da equipe, portanto devem ser inseridos diretamente n
 
 ## Segurança aplicada
 
-- Visitantes consultam somente produtos publicados e OS/garantias com o número da OS e o código entregue pela loja.
+- Visitantes consultam somente produtos publicados e OS/garantias usando a referência e os quatro últimos dígitos do WhatsApp cadastrado.
 - O navegador não recebe credenciais de banco privilegiadas, PIN/senha do aparelho, observações internas, dados financeiros nem estoque interno.
 - PIN/senha opcional do aparelho é cifrado no servidor, protegido por função e permissão da equipe e não aparece na consulta pública.
-- Funcionários enviam orçamentos pela área restrita; o cliente aprova ou recusa na consulta protegida pelo código da OS, sem conta.
+- Funcionários enviam orçamentos pela área restrita; o cliente aprova ou recusa sem conta usando o número da OS e os quatro últimos dígitos do WhatsApp cadastrado.
 - As sessões da equipe ficam apenas na memória da página; ao atualizar, a pessoa entra novamente.
 - Cadastros de clientes não criam contas de autenticação.
 

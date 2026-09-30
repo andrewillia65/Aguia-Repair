@@ -72,6 +72,11 @@ export function normalizeCode(value: unknown): string {
   return String(value ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
+export function normalizePhoneLastFour(value: unknown): string {
+  const digits = String(value ?? "").replace(/\D/g, "");
+  return digits.length >= 4 ? digits.slice(-4) : "";
+}
+
 export function normalizeCpf(value: unknown): string | null {
   const digits = String(value ?? "").replace(/\D/g, "");
   return digits || null;

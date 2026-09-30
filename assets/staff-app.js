@@ -533,7 +533,7 @@
       ? '<a class="staff-notify-link" href="https://wa.me/' + esc(whatsappNumber) + '?text=' + encodeURIComponent(
           "Olá, " + customer + "! Aqui é da Águia Repair. A situação da sua OS " + order.order_number + " (" + [order.brand, order.model].filter(Boolean).join(" ") +
           ") foi atualizada para: " + (statusLabels[order.status] || order.status) + ". " + (statusPublicNotes[order.status] || "") +
-          " Você pode acompanhar pelo site aguiarepair.com.br, em Acompanhar OS, usando o número e o código do comprovante."
+          " Você pode acompanhar em aguiarepair.com.br, em Acompanhar OS, usando esta OS e os 4 últimos dígitos deste WhatsApp."
         ) + '" target="_blank" rel="noopener noreferrer">Avisar no WhatsApp ↗</a>'
       : "—";
     const deviceDetail = [order.color, order.storage_capacity].filter(Boolean).join(" · ");
@@ -770,8 +770,7 @@
     $("#device-brand")?.dispatchEvent(new Event("change"));
     const result = $("#new-order-result");
     result.hidden = false;
-    result.innerHTML = "<strong>OS criada: " + esc(response.orderNumber) + "</strong><br>Código para entregar ao cliente: <code>" +
-      esc(response.accessCode) + "</code><br>" + esc(response.message);
+    result.innerHTML = "<strong>OS criada: " + esc(response.orderNumber) + "</strong><br>" + esc(response.message);
     let uploaded = 0;
     for (let index = 0; index < photos.length; index++) {
       const file = photos[index];
@@ -865,7 +864,7 @@
       });
       if (!rows?.[0]) throw new Error("Não foi possível enviar este orçamento.");
       form.reset();
-      message("quote-message", "Orçamento enviado para a OS " + rows[0].order_number + ". O cliente pode aprovar sem criar conta, usando o código da OS.");
+      message("quote-message", "Orçamento enviado para a OS " + rows[0].order_number + ". O cliente pode aprovar sem criar conta, usando os 4 últimos dígitos do WhatsApp cadastrado.");
       await loadDashboardData();
     }, "quote-message");
 
@@ -967,7 +966,7 @@
             p_expires_on: data.get("expiresOn"),
             p_public_code_hash: hash
           }});
-          standaloneResult = { ...(result?.[0] || {}), accessCode };
+          standaloneResult = result?.[0] || null;
         } catch (error) {
           if (error.code === "23505") throw new Error("Esta venda já possui uma garantia registrada.");
           if (error.code === "42501") throw new Error("Sua conta não tem permissão para registrar garantias.");
@@ -980,13 +979,12 @@
       const result = $("#warranty-created-result");
       if (standaloneResult?.warranty_number) {
         result.hidden = false;
-        result.innerHTML = "<strong>Garantia avulsa registrada: " + esc(standaloneResult.warranty_number) + "</strong><br>Entregue ao cliente a referência e este código de consulta: <code>" +
-          esc(standaloneResult.accessCode) + "</code><br>O código será mostrado somente agora. Anote ou copie antes de sair desta tela.";
+        result.innerHTML = "<strong>Garantia avulsa registrada: " + esc(standaloneResult.warranty_number) + "</strong><br>O cliente consulta com esta referência e os 4 últimos dígitos do WhatsApp cadastrado.";
         message("warranty-message", "Garantia registrada com sucesso.");
       } else {
         result.hidden = true;
         result.textContent = "";
-        message("warranty-message", "Garantia registrada. O cliente poderá consultá-la com o número da OS e o código do atendimento.");
+        message("warranty-message", "Garantia registrada. O cliente poderá consultá-la com o número da OS e os 4 últimos dígitos do WhatsApp cadastrado.");
       }
       form.elements.namedItem("startsOn").value = localToday();
       updateWarrantySource(form);

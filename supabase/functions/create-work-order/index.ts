@@ -84,8 +84,7 @@ Deno.serve(async req => {
     return json(req, {
       orderId: data[0].id,
       orderNumber: data[0].order_number,
-      accessCode,
-      message: "Anote o código e entregue ao cliente. Ele não poderá ser recuperado depois."
+      message: "O cliente acompanha no site usando o número da OS e os 4 últimos dígitos do WhatsApp cadastrado."
     }, 201);
   } catch (error) {
     const reason = error instanceof Error ? error.message : "";

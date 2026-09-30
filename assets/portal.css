@@ -17,7 +17,7 @@
 .catalog-card h3{margin:0 0 7px;font-size:16px;font-weight:600}
 .catalog-card p{margin:0;color:#b6b6be;font-size:12px;line-height:1.6}
 .catalog-card .catalog-price{margin-top:11px;color:#f0d48f;font-weight:650}
-.lookup-form{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}
+.lookup-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end}
 .lookup-form label{display:grid;gap:7px;color:#dddde1;font-size:12px;font-weight:600}
 .lookup-form input{width:100%;min-height:48px;padding:0 13px;border:1px solid #ffffff25;border-radius:12px;background:#0d0e12a8;color:#f4f3ef;font:inherit;font-size:14px;outline:none}
 .lookup-form input::placeholder{color:#888992;font-weight:400}

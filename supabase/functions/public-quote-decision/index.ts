@@ -1,11 +1,4 @@
-import { corsHeaders, json, serviceClient, hmacHex, sha256, normalizeCode } from "../_shared/common.ts";
-
-function constantTimeEqual(left: string, right: string): boolean {
-  if (left.length !== right.length) return false;
-  let difference = 0;
-  for (let index = 0; index < left.length; index++) difference |= left.charCodeAt(index) ^ right.charCodeAt(index);
-  return difference === 0;
-}
+import { corsHeaders, json, serviceClient, hmacHex, normalizePhoneLastFour } from "../_shared/common.ts";
 
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders(req) });
@@ -26,9 +19,9 @@ Deno.serve(async req => {
     return json(req, { error: "invalid_request" }, 400);
   }
   const orderNumber = String(input.orderNumber ?? "").trim().toUpperCase();
-  const accessCode = normalizeCode(input.accessCode);
+  const whatsappLast4 = String(input.whatsappLast4 ?? "").replace(/\D/g, "");
   const decision = input.decision === "approved" || input.decision === "rejected" ? input.decision : "";
-  if (!/^AR-[0-9]{6,10}$/.test(orderNumber) || accessCode.length !== 16 || !decision) {
+  if (!/^AR-[0-9]{6,10}$/.test(orderNumber) || !/^\d{4}$/.test(whatsappLast4) || !decision) {
     return json(req, { error: "not_found" }, 404);
   }
 
@@ -40,11 +33,13 @@ Deno.serve(async req => {
     if (rateError || allowed !== true) return json(req, { error: "rate_limited" }, 429);
 
     const { data: order, error: orderError } = await client.from("work_orders")
-      .select("id,order_number,public_tracking_hash")
+      .select("id,customer_id,order_number")
       .eq("order_number", orderNumber)
       .maybeSingle();
-    const suppliedHash = await sha256(accessCode);
-    if (orderError || !order || !constantTimeEqual(suppliedHash, order.public_tracking_hash)) {
+    const { data: customer, error: customerError } = order
+      ? await client.from("customers").select("whatsapp").eq("id", order.customer_id).maybeSingle()
+      : { data: null, error: null };
+    if (orderError || customerError || !order || normalizePhoneLastFour(customer?.whatsapp) !== whatsappLast4) {
       return json(req, { error: "not_found" }, 404);
     }
     const { data, error } = await client.rpc("decide_public_quote", {
