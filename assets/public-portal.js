@@ -63,7 +63,9 @@
       resultElement.innerHTML = `<h3>OS ${escapeHtml(payload.orderNumber)}</h3><p><strong>Status:</strong> ${escapeHtml(payload.statusLabel)}</p><p><strong>Aparelho:</strong> ${escapeHtml(payload.deviceLabel)}</p>${deviceDetails}${quoteMarkup}${events.length ? `<ol>${events.map(event => `<li>${escapeHtml(event.label)} · ${escapeHtml(formatDate(event.date))}</li>`).join("")}</ol>` : ""}`;
       return;
     }
-    resultElement.innerHTML = `<h3>Garantia da OS ${escapeHtml(payload.orderNumber)}</h3><p><strong>Situação:</strong> ${escapeHtml(payload.statusLabel)}</p><p><strong>Serviço:</strong> ${escapeHtml(payload.coverageSummary)}</p><p><strong>Validade:</strong> ${escapeHtml(formatDate(payload.startsOn))} até ${escapeHtml(formatDate(payload.expiresOn))}</p>`;
+    const reference = payload.warrantyNumber ? `Garantia ${payload.warrantyNumber}` : `Garantia da OS ${payload.orderNumber}`;
+    const item = payload.itemDescription ? `<p><strong>Produto/serviço:</strong> ${escapeHtml(payload.itemDescription)}</p>` : "";
+    resultElement.innerHTML = `<h3>${escapeHtml(reference)}</h3><p><strong>Situação:</strong> ${escapeHtml(payload.statusLabel)}</p>${item}<p><strong>Cobertura:</strong> ${escapeHtml(payload.coverageSummary)}</p><p><strong>Validade:</strong> ${escapeHtml(formatDate(payload.startsOn))} até ${escapeHtml(formatDate(payload.expiresOn))}</p>`;
   }
 
   function setupLookup(formId, resultId, type) {

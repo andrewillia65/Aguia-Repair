@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/staff.css">
   <script src="assets/supabase-config.js" defer></script>
   <script src="assets/device-catalog.js" defer></script>
-  <script src="assets/staff-app.js?v=4" defer></script>
+  <script src="assets/staff-app.js?v=5" defer></script>
 </head>
 <body class="simple-home staff-page">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
@@ -185,13 +185,26 @@
           <section class="staff-screen" data-screen="warranties" hidden>
             <div class="staff-screen-heading"><div><p class="eyebrow">PÓS-REPARO</p><h2>Garantias</h2></div></div>
             <form id="warranty-form" class="staff-panel staff-form staff-form-grid">
-              <h3 class="form-section-title">Registrar garantia de uma OS</h3>
-              <label>Número da OS<input name="orderNumber" required maxlength="20" placeholder="AR-001234"></label>
+              <h3 class="form-section-title">Registrar garantia</h3>
+              <label>Tipo de garantia<select name="sourceType"><option value="work_order">Serviço com OS</option><option value="sale">Venda registrada</option><option value="quick_service">Serviço rápido, sem OS</option></select></label>
+              <div class="span-two" data-warranty-source="work_order">
+                <label>Número da OS<input name="orderNumber" data-required="true" required maxlength="20" placeholder="AR-001234"></label>
+              </div>
+              <div class="span-two" data-warranty-source="sale" hidden>
+                <label>Venda<select name="saleId" data-required="true" id="warranty-sale-choice"><option value="">Carregando vendas...</option></select><small>Selecione uma venda já registrada. Cada venda pode ter uma garantia avulsa.</small></label>
+              </div>
+              <div class="span-two" data-warranty-source="quick_service" hidden>
+                <label class="span-two">Cliente já cadastrado (opcional)<select name="warrantyCustomerId" id="warranty-customer-choice"><option value="">Novo cliente — preencher abaixo</option></select><small>Se selecionar um cliente, nome e WhatsApp serão preenchidos. Se for novo, deixe em branco e informe os dados abaixo.</small></label>
+                <label>Nome<input name="customerName" data-required="true" minlength="2" maxlength="160" autocomplete="name"></label>
+                <label>WhatsApp<input name="customerWhatsapp" type="tel" data-required="true" minlength="8" maxlength="24" autocomplete="tel"></label>
+                <label class="span-two">Produto ou serviço<input name="itemDescription" data-required="true" maxlength="300" placeholder="Ex.: troca de película, venda de carregador"></label>
+              </div>
               <label>Início<input name="startsOn" type="date" required></label>
               <label>Validade<input name="expiresOn" type="date" required></label>
               <label class="span-two">Cobertura informada ao cliente<textarea name="coverageSummary" required rows="2" maxlength="2000"></textarea></label>
               <button class="staff-action span-two" type="submit">Registrar garantia</button>
               <p id="warranty-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+              <div id="warranty-created-result" class="order-created span-two" role="status" aria-live="polite" hidden></div>
             </form>
             <div id="warranties-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando garantias...</p></div>
           </section>

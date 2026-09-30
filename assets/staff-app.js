@@ -88,7 +88,7 @@
   function updateCustomerChoices(rows) {
     customerRecords.clear();
     rows.forEach(customer => customerRecords.set(customer.id, customer));
-    [$("#order-customer-choice"), $("#sale-customer-choice")].filter(Boolean).forEach(select => {
+    [$("#order-customer-choice"), $("#sale-customer-choice"), $("#warranty-customer-choice")].filter(Boolean).forEach(select => {
       const currentValue = select.value;
       select.replaceChildren(new Option("Novo cliente — cadastrar neste atendimento", ""));
       rows.forEach(customer => select.add(new Option(
@@ -176,6 +176,27 @@
     const date = new Date();
     date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
     return date.toISOString().slice(0, 10);
+  }
+
+  function generateAccessCode() {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    return Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => alphabet[byte & 31]).join("");
+  }
+
+  async function hashAccessCode(value) {
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+    return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function updateWarrantySource(form) {
+    const source = form?.elements.namedItem("sourceType")?.value || "work_order";
+    form?.querySelectorAll("[data-warranty-source]").forEach(section => {
+      const active = section.dataset.warrantySource === source;
+      section.hidden = !active;
+      section.querySelectorAll("input, select, textarea").forEach(field => {
+        field.required = active && field.dataset.required === "true";
+      });
+    });
   }
 
   function updateSaleTotal() {
@@ -625,15 +646,46 @@
   }
 
   async function loadWarranties() {
-    const rows = await getRows("warranties", {
-      select: "id,work_order_id,coverage_summary,starts_on,expires_on,status,work_orders(order_number)",
-      order: "expires_on.desc",
-      limit: "300"
-    });
-    $("#warranties-table").innerHTML = table(["OS", "Cobertura", "Início", "Validade", "Situação"],
-      rows.map(row => "<tr><td>" + esc(row.work_orders?.order_number || row.work_order_id.slice(0, 8)) + "</td><td>" + esc(row.coverage_summary) +
-        "</td><td>" + esc(dateText(row.starts_on)) + "</td><td>" + esc(dateText(row.expires_on)) + "</td><td>" + esc(row.status) + "</td></tr>"),
-      "Nenhuma garantia registrada.");
+    const [rows, sales, customers] = await Promise.all([
+      getRows("warranties", {
+        select: "id,work_order_id,warranty_number,source_type,sale_id,customer_id,item_description,coverage_summary,starts_on,expires_on,status,work_orders(order_number),customers(name)",
+        order: "expires_on.desc",
+        limit: "300"
+      }),
+      getRows("sales", { select: "id,product_name,quantity,occurred_on,customers(name)", order: "created_at.desc", limit: "300" }),
+      loadCustomerChoices()
+    ]);
+    const customerSelect = $("#warranty-customer-choice");
+    if (customerSelect) {
+      const selected = customerSelect.value;
+      customerSelect.replaceChildren(new Option("Selecione um cliente", ""));
+      customers.forEach(customer => customerSelect.add(new Option(customer.name + " · " + customer.whatsapp, customer.id)));
+      if (customers.some(customer => customer.id === selected)) customerSelect.value = selected;
+    }
+    const saleSelect = $("#warranty-sale-choice");
+    if (saleSelect) {
+      const usedSaleIds = new Set(rows.filter(row => row.source_type === "sale" && row.sale_id).map(row => row.sale_id));
+      saleSelect.replaceChildren(new Option("Selecione uma venda", ""));
+      sales.forEach(sale => {
+        const option = new Option(dateText(sale.occurred_on) + " · " + sale.product_name + " · " + (sale.customers?.name || "Cliente"), sale.id);
+        option.disabled = usedSaleIds.has(sale.id);
+        if (option.disabled) option.text += " · garantia já registrada";
+        saleSelect.add(option);
+      });
+    }
+    const warrantyForm = $("#warranty-form");
+    if (warrantyForm) {
+      if (!warrantyForm.elements.namedItem("startsOn").value) warrantyForm.elements.namedItem("startsOn").value = localToday();
+      updateWarrantySource(warrantyForm);
+    }
+    const statusLabels = { active: "Ativa", expired: "Expirada", void: "Cancelada" };
+    $("#warranties-table").innerHTML = table(["Referência", "Cliente", "Produto/serviço", "Cobertura", "Validade", "Situação"],
+      rows.map(row => {
+        const reference = row.work_orders?.order_number || row.warranty_number || "Garantia";
+        const item = row.item_description || row.coverage_summary;
+        return "<tr><td><strong>" + esc(reference) + "</strong></td><td>" + esc(row.customers?.name || "—") + "</td><td>" + esc(item) +
+          "</td><td>" + esc(row.coverage_summary) + "</td><td>" + esc(dateText(row.expires_on)) + "</td><td>" + esc(statusLabels[row.status] || row.status) + "</td></tr>";
+      }), "Nenhuma garantia registrada.");
   }
 
   async function loadFinance() {
@@ -885,19 +937,59 @@
 
     setupForm("warranty-form", async form => {
       const data = new FormData(form);
-      const orderNumber = String(data.get("orderNumber")).trim().toUpperCase();
-      const orders = await getRows("work_orders", { select: "id", order_number: "eq." + orderNumber, limit: "1" });
-      if (!orders[0]) throw new Error("OS não encontrada ou sem permissão para acessá-la.");
-      await api("/rest/v1/warranties", { method: "POST", body: {
-        work_order_id: orders[0].id,
-        coverage_summary: String(data.get("coverageSummary")).trim(),
-        starts_on: data.get("startsOn"),
-        expires_on: data.get("expiresOn"),
-        status: "active",
-        created_by: staff.user_id
-      }});
+      const sourceType = String(data.get("sourceType") || "work_order");
+      let standaloneResult = null;
+      if (sourceType === "work_order") {
+        const orderNumber = String(data.get("orderNumber") || "").trim().toUpperCase();
+        const orders = await getRows("work_orders", { select: "id", order_number: "eq." + orderNumber, limit: "1" });
+        if (!orders[0]) throw new Error("OS não encontrada ou sem permissão para acessá-la.");
+        await api("/rest/v1/warranties", { method: "POST", body: {
+          work_order_id: orders[0].id,
+          coverage_summary: String(data.get("coverageSummary") || "").trim(),
+          starts_on: data.get("startsOn"),
+          expires_on: data.get("expiresOn"),
+          status: "active",
+          created_by: staff.user_id
+        }});
+      } else {
+        const accessCode = generateAccessCode();
+        const hash = await hashAccessCode(accessCode);
+        try {
+          const result = await api("/rest/v1/rpc/create_standalone_warranty", { method: "POST", body: {
+            p_source_type: sourceType,
+            p_customer_id: sourceType === "quick_service" ? data.get("warrantyCustomerId") || null : null,
+            p_customer_name: sourceType === "quick_service" ? String(data.get("customerName") || "").trim() : null,
+            p_customer_whatsapp: sourceType === "quick_service" ? String(data.get("customerWhatsapp") || "").trim() : null,
+            p_sale_id: sourceType === "sale" ? data.get("saleId") || null : null,
+            p_item_description: sourceType === "quick_service" ? data.get("itemDescription") || null : null,
+            p_coverage_summary: String(data.get("coverageSummary") || "").trim(),
+            p_starts_on: data.get("startsOn"),
+            p_expires_on: data.get("expiresOn"),
+            p_public_code_hash: hash
+          }});
+          standaloneResult = { ...(result?.[0] || {}), accessCode };
+        } catch (error) {
+          if (error.code === "23505") throw new Error("Esta venda já possui uma garantia registrada.");
+          if (error.code === "42501") throw new Error("Sua conta não tem permissão para registrar garantias.");
+          if (error.code === "P0002") throw new Error("A venda ou o cliente não foi encontrado. Atualize a tela e tente novamente.");
+          if (error.code === "22023") throw new Error("Confira o cliente, produto/serviço, cobertura e as datas da garantia.");
+          throw error;
+        }
+      }
       form.reset();
-      message("warranty-message", "Garantia registrada. O cliente poderá consultá-la com o código da OS.");
+      const result = $("#warranty-created-result");
+      if (standaloneResult?.warranty_number) {
+        result.hidden = false;
+        result.innerHTML = "<strong>Garantia avulsa registrada: " + esc(standaloneResult.warranty_number) + "</strong><br>Entregue ao cliente a referência e este código de consulta: <code>" +
+          esc(standaloneResult.accessCode) + "</code><br>O código será mostrado somente agora. Anote ou copie antes de sair desta tela.";
+        message("warranty-message", "Garantia registrada com sucesso.");
+      } else {
+        result.hidden = true;
+        result.textContent = "";
+        message("warranty-message", "Garantia registrada. O cliente poderá consultá-la com o número da OS e o código do atendimento.");
+      }
+      form.elements.namedItem("startsOn").value = localToday();
+      updateWarrantySource(form);
       await loadWarranties();
     }, "warranty-message");
 
@@ -1028,6 +1120,9 @@
   setupDeviceCatalog();
   $("#order-customer-choice")?.addEventListener("change", event => fillCustomerFromChoice(event.currentTarget.form, "existingCustomerId"));
   $("#sale-customer-choice")?.addEventListener("change", event => fillCustomerFromChoice(event.currentTarget.form, "saleCustomerId"));
+  $("#warranty-form")?.elements.namedItem("sourceType")?.addEventListener("change", event => updateWarrantySource(event.currentTarget.form));
+  $("#warranty-customer-choice")?.addEventListener("change", event => fillCustomerFromChoice(event.currentTarget.form, "warrantyCustomerId"));
+  if ($("#warranty-form")) updateWarrantySource($("#warranty-form"));
   $("#new-order-form")?.elements.namedItem("customerWhatsapp")?.addEventListener("input", event => matchCustomerByWhatsapp(event.currentTarget.form, "existingCustomerId"));
   $("#sale-form")?.elements.namedItem("customerWhatsapp")?.addEventListener("input", event => matchCustomerByWhatsapp(event.currentTarget.form, "saleCustomerId"));
   $$('[data-cpf-input]').forEach(input => input.addEventListener("input", event => {

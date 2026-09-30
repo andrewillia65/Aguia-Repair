@@ -40,6 +40,7 @@ Deno.serve(async req => {
   const type = input.type === "warranty" ? "warranty" : input.type === "order" ? "order" : "";
   const orderNumber = String(input.orderNumber ?? "").trim().toUpperCase();
   const accessCode = normalizeCode(input.accessCode);
+  const standaloneWarranty = type === "warranty" && /^GAR-[0-9]{6,10}$/.test(orderNumber);
 
   const forwarded = req.headers.get("cf-connecting-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
   const rateKey = await hmacHex(rateSalt, forwarded);
@@ -47,11 +48,31 @@ Deno.serve(async req => {
   const { data: allowed, error: rateError } = await client.rpc("consume_public_lookup", { key_digest: rateKey });
   if (rateError || allowed !== true) return json(req, { error: "rate_limited" }, 429);
 
-  if (!type || !/^AR-[0-9]{6,10}$/.test(orderNumber) || accessCode.length !== 16) {
+  if (!type || (!standaloneWarranty && !/^AR-[0-9]{6,10}$/.test(orderNumber)) || accessCode.length !== 16) {
     return json(req, { error: "not_found" }, 404);
   }
 
   try {
+    if (standaloneWarranty) {
+      const { data: warranty, error: warrantyError } = await client.from("warranties")
+        .select("warranty_number,public_code_hash,item_description,coverage_summary,starts_on,expires_on,status")
+        .eq("warranty_number", orderNumber)
+        .maybeSingle();
+      const suppliedHash = await sha256(accessCode);
+      if (warrantyError || !warranty?.public_code_hash || !constantTimeEqual(suppliedHash, warranty.public_code_hash)) {
+        return json(req, { error: "not_found" }, 404);
+      }
+      const expired = warranty.status === "expired" || warranty.expires_on < new Date().toISOString().slice(0, 10);
+      return json(req, {
+        warrantyNumber: warranty.warranty_number,
+        itemDescription: warranty.item_description,
+        statusLabel: expired ? "Prazo encerrado" : warranty.status === "void" ? "Cancelada" : "Ativa",
+        coverageSummary: warranty.coverage_summary,
+        startsOn: warranty.starts_on,
+        expiresOn: warranty.expires_on
+      });
+    }
+
     const { data: order, error } = await client.from("work_orders")
       .select("id,order_number,brand,model,color,storage_capacity,status,public_tracking_hash")
       .eq("order_number", orderNumber)

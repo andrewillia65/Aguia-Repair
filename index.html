@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="assets/site.css">
   <link rel="stylesheet" href="assets/portal.css">
   <script src="assets/supabase-config.js" defer></script>
-  <script src="assets/public-portal.js" defer></script>
+  <script src="assets/public-portal.js?v=2" defer></script>
 </head>
 <body class="simple-home">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
@@ -51,9 +51,9 @@
     </section>
 
     <section id="garantia" class="portal-section" aria-labelledby="warranty-heading">
-      <div class="portal-section-heading"><div><p class="eyebrow">SEU SERVIÇO</p><h2 id="warranty-heading">Informações de garantia</h2></div><p>Consulte a garantia registrada para o seu reparo com os dados do comprovante.</p></div>
+      <div class="portal-section-heading"><div><p class="eyebrow">SEU SERVIÇO</p><h2 id="warranty-heading">Informações de garantia</h2></div><p>Consulte uma garantia de OS ou uma garantia avulsa de venda/serviço com os dados do comprovante.</p></div>
       <form id="warranty-lookup-form" class="lookup-form">
-        <label>Número da OS<input name="orderNumber" autocomplete="off" placeholder="Ex.: AR-001234" required maxlength="20"></label>
+        <label>Número da OS ou garantia<input name="orderNumber" autocomplete="off" placeholder="Ex.: AR-001234 ou GAR-001001" required maxlength="20"></label>
         <label>Código de consulta<input name="accessCode" autocomplete="off" placeholder="Código do seu comprovante" required maxlength="32"></label>
         <button class="simple-primary" type="submit">Consultar garantia <span aria-hidden="true">↗</span></button>
       </form>
