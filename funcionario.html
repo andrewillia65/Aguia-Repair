@@ -82,6 +82,7 @@
                 <label class="span-two">Cliente cadastrado<select name="existingCustomerId" id="order-customer-choice"><option value="">Novo cliente — cadastrar neste atendimento</option></select><small>Escolha na lista ou informe um WhatsApp cadastrado para preencher os dados. Se for novo, preencha abaixo.</small></label>
                 <label>Nome<input name="customerName" required maxlength="160" autocomplete="name"></label>
                 <label>WhatsApp<input name="customerWhatsapp" type="tel" required maxlength="24" autocomplete="tel"></label>
+                <label>CPF (opcional)<input name="customerCpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off" data-cpf-input><small>Visível apenas à equipe. Se faltar no cadastro, pode informar aqui.</small></label>
                 <label class="span-two">E-mail (opcional)<input name="customerEmail" type="email" maxlength="200" autocomplete="email"></label>
                 <h3 class="form-section-title">Aparelho</h3>
                 <label>Marca<select name="brand" id="device-brand" required><option value="">Selecione a marca</option></select><input name="customBrand" id="device-brand-custom" hidden maxlength="80" placeholder="Digite a marca"></label>
@@ -120,6 +121,7 @@
               <h3 class="form-section-title">Adicionar cliente</h3>
               <label>Nome<input name="name" required maxlength="160" autocomplete="name"></label>
               <label>WhatsApp<input name="whatsapp" type="tel" required minlength="8" maxlength="24" autocomplete="tel"></label>
+              <label>CPF (opcional)<input name="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off" data-cpf-input><small>Visível apenas à equipe.</small></label>
               <label class="span-two">E-mail (opcional)<input name="email" type="email" maxlength="200" autocomplete="email"></label>
               <button class="staff-action span-two" type="submit">Cadastrar cliente</button>
               <p id="customer-message" class="staff-message span-two" role="status" aria-live="polite"></p>
@@ -165,6 +167,7 @@
               <label class="span-two">Cliente cadastrado<select name="saleCustomerId" id="sale-customer-choice"><option value="">Novo cliente — cadastrar nesta venda</option></select><small>Escolha na lista ou informe um WhatsApp cadastrado para preencher os dados. Se for novo, preencha abaixo.</small></label>
               <label>Nome<input name="customerName" required maxlength="160" autocomplete="name"></label>
               <label>WhatsApp<input name="customerWhatsapp" type="tel" required maxlength="24" autocomplete="tel"></label>
+              <label>CPF (opcional)<input name="customerCpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off" data-cpf-input><small>Visível apenas à equipe. Se faltar no cadastro, pode informar aqui.</small></label>
               <label class="span-two">E-mail (opcional)<input name="customerEmail" type="email" maxlength="200" autocomplete="email"></label>
               <label class="span-two">Produto do estoque<select name="inventoryItemId" id="sale-product-choice" required><option value="">Carregando estoque...</option></select></label>
               <label>Quantidade<input name="quantity" type="number" min="1" step="1" value="1" required></label>

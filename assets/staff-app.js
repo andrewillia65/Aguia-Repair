@@ -101,21 +101,54 @@
     });
   }
 
-  function fillCustomerFromChoice(form, selectName) {
+  function fillCustomerFromChoice(form, selectName, preserveManualCpf = false) {
     const select = form?.elements.namedItem(selectName);
     const customer = select?.value ? customerRecords.get(select.value) : null;
-    ["customerName", "customerWhatsapp", "customerEmail"].forEach(name => {
+    ["customerName", "customerWhatsapp", "customerEmail", "customerCpf"].forEach(name => {
       const input = form?.elements.namedItem(name);
       if (!input) return;
       if (customer) {
-        input.value = customer[name === "customerName" ? "name" : name === "customerWhatsapp" ? "whatsapp" : "email"] || "";
-        input.dataset.customerPrefill = "true";
+        const customerField = { customerName: "name", customerWhatsapp: "whatsapp", customerEmail: "email", customerCpf: "cpf" }[name];
+        const keepTypedCpf = preserveManualCpf && name === "customerCpf" && !customer.cpf && input.value && !input.dataset.customerPrefill;
+        if (!keepTypedCpf) {
+          input.value = name === "customerCpf" ? formatCpf(customer[customerField] || "") : customer[customerField] || "";
+          input.dataset.customerPrefill = "true";
+        }
       } else if (input.dataset.customerPrefill) {
         input.value = "";
         delete input.dataset.customerPrefill;
       }
-      input.readOnly = Boolean(customer);
+      input.readOnly = Boolean(customer) && (name !== "customerCpf" || Boolean(customer.cpf));
     });
+  }
+
+  function cpfDigits(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function formatCpf(value) {
+    const digits = cpfDigits(value).slice(0, 11);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return digits.slice(0, 3) + "." + digits.slice(3);
+    if (digits.length <= 9) return digits.slice(0, 3) + "." + digits.slice(3, 6) + "." + digits.slice(6);
+    return digits.slice(0, 3) + "." + digits.slice(3, 6) + "." + digits.slice(6, 9) + "-" + digits.slice(9);
+  }
+
+  function validCpfDigits(digits) {
+    if (!/^\d{11}$/.test(digits) || /^(\d)\1{10}$/.test(digits)) return false;
+    const checkDigit = length => {
+      let sum = 0;
+      for (let index = 0; index < length; index++) sum += Number(digits[index]) * (length + 1 - index);
+      const remainder = (sum * 10) % 11;
+      return remainder === 10 ? 0 : remainder;
+    };
+    return checkDigit(9) === Number(digits[9]) && checkDigit(10) === Number(digits[10]);
+  }
+
+  function customerCpf(value) {
+    const digits = cpfDigits(value);
+    if (digits && !validCpfDigits(digits)) throw new Error("CPF inválido. Confira os 11 dígitos ou deixe o campo vazio.");
+    return digits || null;
   }
 
   function matchCustomerByWhatsapp(form, selectName) {
@@ -127,12 +160,12 @@
     const select = form.elements.namedItem(selectName);
     if (select && select.value !== customer.id) {
       select.value = customer.id;
-      fillCustomerFromChoice(form, selectName);
+      fillCustomerFromChoice(form, selectName, true);
     }
   }
 
   async function loadCustomerChoices() {
-    const rows = await getRows("customers", { select: "id,name,whatsapp,email", order: "name.asc", limit: "1000" });
+    const rows = await getRows("customers", { select: "id,name,whatsapp,email,cpf", order: "name.asc", limit: "1000" });
     updateCustomerChoices(rows);
     return rows;
   }
@@ -454,10 +487,10 @@
   }
 
   async function loadCustomers() {
-    const rows = await getRows("customers", { select: "id,name,whatsapp,email,created_at", order: "created_at.desc", limit: "1000" });
+    const rows = await getRows("customers", { select: "id,name,whatsapp,email,cpf,created_at", order: "created_at.desc", limit: "1000" });
     updateCustomerChoices(rows);
-    $("#customers-table").innerHTML = table(["Nome", "WhatsApp", "E-mail", "Cadastro"],
-      rows.map(row => "<tr><td>" + esc(row.name) + "</td><td>" + esc(row.whatsapp) + "</td><td>" + esc(row.email || "—") + "</td><td>" + esc(dateText(row.created_at)) + "</td></tr>"),
+    $("#customers-table").innerHTML = table(["Nome", "WhatsApp", "CPF", "E-mail", "Cadastro"],
+      rows.map(row => "<tr><td>" + esc(row.name) + "</td><td>" + esc(row.whatsapp) + "</td><td>" + esc(row.cpf ? "***.***.***-" + row.cpf.slice(-2) : "—") + "</td><td>" + esc(row.email || "—") + "</td><td>" + esc(dateText(row.created_at)) + "</td></tr>"),
       "Nenhum cliente cadastrado.");
   }
 
@@ -573,7 +606,8 @@
         id: data.get("existingCustomerId") || null,
         name: data.get("customerName"),
         whatsapp: data.get("customerWhatsapp"),
-        email: data.get("customerEmail")
+        email: data.get("customerEmail"),
+        cpf: customerCpf(data.get("customerCpf"))
       },
       device: {
         brand,
@@ -663,12 +697,17 @@
       const name = String(data.get("name") || "").trim();
       const whatsapp = String(data.get("whatsapp") || "").trim();
       const email = String(data.get("email") || "").trim().toLowerCase() || null;
+      const cpf = customerCpf(data.get("cpf"));
       if (name.length < 1 || whatsapp.length < 8 || whatsapp.length > 24) {
         throw new Error("Informe o nome e um WhatsApp válido com DDD.");
       }
       const duplicate = await getRows("customers", { select: "id", whatsapp: "eq." + whatsapp, limit: "1" });
       if (duplicate[0]) throw new Error("Já existe um cliente cadastrado com esse WhatsApp.");
-      await api("/rest/v1/customers", { method: "POST", body: { name, whatsapp, email } });
+      if (cpf) {
+        const duplicateCpf = await getRows("customers", { select: "id", cpf: "eq." + cpf, limit: "1" });
+        if (duplicateCpf[0]) throw new Error("Já existe um cliente cadastrado com esse CPF.");
+      }
+      await api("/rest/v1/customers", { method: "POST", body: { name, whatsapp, email, cpf } });
       form.reset();
       message("customer-message", "Cliente cadastrado.");
       await loadCustomers();
@@ -739,7 +778,8 @@
           id: data.get("saleCustomerId") || null,
           name: data.get("customerName"),
           whatsapp: data.get("customerWhatsapp"),
-          email: data.get("customerEmail")
+          email: data.get("customerEmail"),
+          cpf: customerCpf(data.get("customerCpf"))
         },
         sale: {
           inventoryItemId: data.get("inventoryItemId"),
@@ -895,6 +935,12 @@
   $("#sale-customer-choice")?.addEventListener("change", event => fillCustomerFromChoice(event.currentTarget.form, "saleCustomerId"));
   $("#new-order-form")?.elements.namedItem("customerWhatsapp")?.addEventListener("input", event => matchCustomerByWhatsapp(event.currentTarget.form, "existingCustomerId"));
   $("#sale-form")?.elements.namedItem("customerWhatsapp")?.addEventListener("input", event => matchCustomerByWhatsapp(event.currentTarget.form, "saleCustomerId"));
+  $$('[data-cpf-input]').forEach(input => input.addEventListener("input", event => {
+    const target = event.currentTarget;
+    const cursorAtEnd = target.selectionStart === target.value.length;
+    target.value = formatCpf(target.value);
+    if (cursorAtEnd) target.setSelectionRange(target.value.length, target.value.length);
+  }));
   $("#sale-product-choice")?.addEventListener("change", event => {
     const option = event.currentTarget.selectedOptions[0];
     const price = $("#sale-form")?.elements.namedItem("unitPrice");

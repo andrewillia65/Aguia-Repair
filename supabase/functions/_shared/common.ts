@@ -72,6 +72,26 @@ export function normalizeCode(value: unknown): string {
   return String(value ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
+export function normalizeCpf(value: unknown): string | null {
+  const digits = String(value ?? "").replace(/\D/g, "");
+  return digits || null;
+}
+
+export function isValidCpf(value: unknown): boolean {
+  const raw = String(value ?? "").trim();
+  if (!raw) return true;
+  if (!/^[\d.\-\s]+$/.test(raw)) return false;
+  const digits = raw.replace(/\D/g, "");
+  if (!/^\d{11}$/.test(digits) || /^(\d)\1{10}$/.test(digits)) return false;
+  const digitAt = (length: number) => {
+    let sum = 0;
+    for (let index = 0; index < length; index++) sum += Number(digits[index]) * (length + 1 - index);
+    const remainder = (sum * 10) % 11;
+    return remainder === 10 ? 0 : remainder;
+  };
+  return digitAt(9) === Number(digits[9]) && digitAt(10) === Number(digits[10]);
+}
+
 export function randomAccessCode(): string {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const bytes = crypto.getRandomValues(new Uint8Array(16));

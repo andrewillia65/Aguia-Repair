@@ -1,5 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
-import { bearerToken, corsHeaders, encryptDeviceSecret, json, randomAccessCode, sha256, SUPABASE_URL, PUBLISHABLE_KEY } from "../_shared/common.ts";
+import { bearerToken, corsHeaders, encryptDeviceSecret, isValidCpf, json, normalizeCpf, randomAccessCode, sha256, SUPABASE_URL, PUBLISHABLE_KEY } from "../_shared/common.ts";
 
 const optional = (value: unknown, max: number) => String(value ?? "").trim().slice(0, max);
 
@@ -19,7 +19,8 @@ Deno.serve(async req => {
     id: optional(body.customer?.id, 36) || null,
     name: optional(body.customer?.name, 160),
     whatsapp: optional(body.customer?.whatsapp, 24),
-    email: optional(body.customer?.email, 200) || null
+    email: optional(body.customer?.email, 200) || null,
+    cpf: normalizeCpf(body.customer?.cpf)
   };
   const order = {
     brand: optional(body.device?.brand, 80),
@@ -34,7 +35,7 @@ Deno.serve(async req => {
     internalNotes: optional(body.entry?.internalNotes, 3000)
   };
   const accessSecret = optional(body.device?.accessSecret, 200);
-  if ((customer.id && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(customer.id)) ||
+  if ((customer.id && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(customer.id)) || !isValidCpf(body.customer?.cpf) ||
       customer.name.length < 2 || customer.whatsapp.length < 8 || order.brand.length < 1 ||
       order.model.length < 1 || order.reportedIssue.length < 3 ||
       !["android", "iphone", "other", ""].includes(order.platform) ||
