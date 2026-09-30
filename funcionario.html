@@ -108,6 +108,14 @@
 
           <section class="staff-screen" data-screen="customers" hidden>
             <div class="staff-screen-heading"><div><p class="eyebrow">CADASTROS</p><h2>Clientes</h2></div></div>
+            <form id="customer-form" class="staff-panel staff-form staff-form-grid">
+              <h3 class="form-section-title">Adicionar cliente</h3>
+              <label>Nome<input name="name" required maxlength="160" autocomplete="name"></label>
+              <label>WhatsApp<input name="whatsapp" type="tel" required minlength="8" maxlength="24" autocomplete="tel"></label>
+              <label class="span-two">E-mail (opcional)<input name="email" type="email" maxlength="200" autocomplete="email"></label>
+              <button class="staff-action span-two" type="submit">Cadastrar cliente</button>
+              <p id="customer-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+            </form>
             <div id="customers-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando clientes...</p></div>
           </section>
 

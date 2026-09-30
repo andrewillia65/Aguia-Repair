@@ -112,6 +112,8 @@
         ? ["overview", "orders", "customers", "warranties"]
         : ["overview", "orders", "customers", "catalog", "inventory", "warranties"];
     $$("[data-screen-target]").forEach(button => { button.hidden = !allowed.includes(button.dataset.screenTarget); });
+    const customerForm = $("#customer-form");
+    if (customerForm) customerForm.hidden = staff.role === "technician";
     const warrantyForm = $("#warranty-form");
     if (warrantyForm) warrantyForm.hidden = staff.role === "technician";
     activateScreen("overview");
@@ -430,6 +432,22 @@
 
   function setupForms() {
     setupForm("new-order-form", submitNewOrder, "new-order-message");
+
+    setupForm("customer-form", async form => {
+      const data = new FormData(form);
+      const name = String(data.get("name") || "").trim();
+      const whatsapp = String(data.get("whatsapp") || "").trim();
+      const email = String(data.get("email") || "").trim().toLowerCase() || null;
+      if (name.length < 1 || whatsapp.length < 8 || whatsapp.length > 24) {
+        throw new Error("Informe o nome e um WhatsApp válido com DDD.");
+      }
+      const duplicate = await getRows("customers", { select: "id", whatsapp: "eq." + whatsapp, limit: "1" });
+      if (duplicate[0]) throw new Error("Já existe um cliente cadastrado com esse WhatsApp.");
+      await api("/rest/v1/customers", { method: "POST", body: { name, whatsapp, email } });
+      form.reset();
+      message("customer-message", "Cliente cadastrado.");
+      await loadCustomers();
+    }, "customer-message");
 
     setupForm("quote-form", async form => {
       const data = new FormData(form);
