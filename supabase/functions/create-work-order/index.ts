@@ -16,6 +16,7 @@ Deno.serve(async req => {
     body = parsed as Record<string, any>;
   } catch { return json(req, { error: "invalid_request" }, 400); }
   const customer = {
+    id: optional(body.customer?.id, 36) || null,
     name: optional(body.customer?.name, 160),
     whatsapp: optional(body.customer?.whatsapp, 24),
     email: optional(body.customer?.email, 200) || null
@@ -24,6 +25,7 @@ Deno.serve(async req => {
     brand: optional(body.device?.brand, 80),
     model: optional(body.device?.model, 120),
     color: optional(body.device?.color, 80),
+    storageCapacity: optional(body.device?.storageCapacity, 40),
     platform: optional(body.device?.platform, 16),
     lockType: optional(body.device?.lockType, 16),
     reportedIssue: optional(body.entry?.reportedIssue, 4000),
@@ -32,7 +34,8 @@ Deno.serve(async req => {
     internalNotes: optional(body.entry?.internalNotes, 3000)
   };
   const accessSecret = optional(body.device?.accessSecret, 200);
-  if (customer.name.length < 2 || customer.whatsapp.length < 8 || order.brand.length < 1 ||
+  if ((customer.id && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(customer.id)) ||
+      customer.name.length < 2 || customer.whatsapp.length < 8 || order.brand.length < 1 ||
       order.model.length < 1 || order.reportedIssue.length < 3 ||
       !["android", "iphone", "other", ""].includes(order.platform) ||
       !["none", "pin", "password", "pattern", "other", ""].includes(order.lockType)) {

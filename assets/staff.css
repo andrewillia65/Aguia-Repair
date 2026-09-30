@@ -11,6 +11,7 @@
 .staff-form input,.staff-form textarea,.staff-form select{width:100%;min-height:45px;padding:10px 12px;border:1px solid #ffffff24;border-radius:11px;background:#0d0f13;color:#f4f3ef;font:inherit;font-size:14px;outline:none}
 .staff-form textarea{resize:vertical}
 .staff-form input:focus,.staff-form textarea:focus,.staff-form select:focus{border-color:#e4c47d;box-shadow:0 0 0 3px #e4c47d20}
+.staff-form input[readonly]{border-color:#ffffff18;background:#17191e;color:#c7c5c0}
 .staff-form small{color:#9d9ea6;font-weight:400;line-height:1.6}
 .staff-form .simple-primary{width:100%;justify-content:center}
 .staff-message{min-height:0;margin:0;color:#d8c28f;font-size:12px;line-height:1.6}
@@ -57,6 +58,8 @@
 .staff-form-grid .span-two{grid-column:1/-1}
 .staff-checkbox{display:flex!important;grid-template-columns:auto 1fr;align-items:center;justify-content:start;gap:9px}
 .staff-checkbox input{width:18px!important;min-height:18px!important;accent-color:#e4c47d}
+.sale-total{margin:0;padding:13px;border:1px solid #e4c47d35;border-radius:11px;background:#e4c47d0c;color:#ccc;font-size:13px}
+.sale-total strong{color:#f0d48f;font-size:17px}
 .order-created{padding:15px;border:1px solid #e4c47d4a;border-radius:13px;background:#e4c47d11;color:#efdcad;font-size:13px;line-height:1.7}
 .order-created strong{color:#fff}
 .order-created code{display:inline-block;padding:5px 8px;border-radius:7px;background:#0b0c0f;color:#fff;font-size:16px;letter-spacing:1px}

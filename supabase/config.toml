@@ -7,6 +7,9 @@ verify_jwt = false
 [functions.create-work-order]
 verify_jwt = true
 
+[functions.create-product-sale]
+verify_jwt = true
+
 [functions.update-work-order-status]
 verify_jwt = true
 

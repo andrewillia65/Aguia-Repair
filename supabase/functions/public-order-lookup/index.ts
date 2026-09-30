@@ -53,7 +53,7 @@ Deno.serve(async req => {
 
   try {
     const { data: order, error } = await client.from("work_orders")
-      .select("id,order_number,brand,model,status,public_tracking_hash")
+      .select("id,order_number,brand,model,color,storage_capacity,status,public_tracking_hash")
       .eq("order_number", orderNumber)
       .maybeSingle();
     const suppliedHash = await sha256(accessCode);
@@ -83,6 +83,7 @@ Deno.serve(async req => {
         orderNumber: order.order_number,
         statusLabel: labels[order.status] ?? "Em andamento",
         deviceLabel: [order.brand, order.model].filter(Boolean).join(" "),
+        deviceDetails: [order.color, order.storage_capacity].filter(Boolean).join(" · "),
         timeline,
         quote: quote ? {
           total: quote.total,

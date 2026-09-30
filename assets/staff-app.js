@@ -22,6 +22,7 @@
     delivered: "Entregue", cancelled: "Cancelado"
   };
   const roleLabels = { admin: "Administrador", technician: "Técnico", employee: "Funcionário" };
+  const customerRecords = new Map();
   const statusPublicNotes = {
     received: "Aparelho recebido pela assistência.",
     diagnosis: "Aparelho em diagnóstico.",
@@ -43,6 +44,112 @@
     ? new Intl.DateTimeFormat("pt-BR").format(new Date(String(value).includes("T") ? value : value + "T00:00:00"))
     : "—";
   const money = value => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value || 0));
+
+  function setupDeviceCatalog() {
+    const catalog = window.AGUIA_DEVICE_CATALOG || {};
+    const brandSelect = $("#device-brand");
+    const brandCustom = $("#device-brand-custom");
+    const modelList = $("#device-model-list");
+    const colorList = $("#device-color-list");
+    if (!brandSelect) return;
+    Object.keys(catalog).sort((a, b) => a.localeCompare(b, "pt-BR")).forEach(brand => {
+      brandSelect.add(new Option(brand, brand));
+    });
+    brandSelect.add(new Option("Outra marca (digitar)", "__other__"));
+    (window.AGUIA_DEVICE_COLORS || []).forEach(color => {
+      const option = document.createElement("option");
+      option.value = color;
+      colorList?.append(option);
+    });
+    const updateModels = () => {
+      if (modelList) {
+        modelList.replaceChildren();
+        (catalog[brandSelect.value] || []).filter(model => !/^outro\b|^digitar modelo/i.test(model)).forEach(model => {
+          const option = document.createElement("option");
+          option.value = model;
+          modelList.append(option);
+        });
+      }
+      const isOther = brandSelect.value === "__other__";
+      if (brandCustom) {
+        brandCustom.hidden = !isOther;
+        brandCustom.required = isOther;
+        if (!isOther) brandCustom.value = "";
+      }
+      const platform = $("#new-order-form")?.elements.namedItem("platform");
+      if (platform && brandSelect.value) platform.value = brandSelect.value === "Apple" ? "iphone" : isOther ? "" : "android";
+    };
+    brandSelect.addEventListener("change", updateModels);
+    updateModels();
+  }
+
+  function updateCustomerChoices(rows) {
+    customerRecords.clear();
+    rows.forEach(customer => customerRecords.set(customer.id, customer));
+    [$("#order-customer-choice"), $("#sale-customer-choice")].filter(Boolean).forEach(select => {
+      const currentValue = select.value;
+      select.replaceChildren(new Option("Novo cliente — cadastrar neste atendimento", ""));
+      rows.forEach(customer => select.add(new Option(
+        customer.name + (customer.whatsapp ? " · " + customer.whatsapp : ""), customer.id
+      )));
+      if (customerRecords.has(currentValue)) select.value = currentValue;
+      const form = select.form;
+      if (form) {
+        fillCustomerFromChoice(form, select.name);
+        matchCustomerByWhatsapp(form, select.name);
+      }
+    });
+  }
+
+  function fillCustomerFromChoice(form, selectName) {
+    const select = form?.elements.namedItem(selectName);
+    const customer = select?.value ? customerRecords.get(select.value) : null;
+    ["customerName", "customerWhatsapp", "customerEmail"].forEach(name => {
+      const input = form?.elements.namedItem(name);
+      if (!input) return;
+      if (customer) {
+        input.value = customer[name === "customerName" ? "name" : name === "customerWhatsapp" ? "whatsapp" : "email"] || "";
+        input.dataset.customerPrefill = "true";
+      } else if (input.dataset.customerPrefill) {
+        input.value = "";
+        delete input.dataset.customerPrefill;
+      }
+      input.readOnly = Boolean(customer);
+    });
+  }
+
+  function matchCustomerByWhatsapp(form, selectName) {
+    const phone = String(form?.elements.namedItem("customerWhatsapp")?.value || "").replace(/\D/g, "");
+    if (phone.length < 8) return;
+    const normalize = value => String(value || "").replace(/\D/g, "").replace(/^55(?=\d{10,11}$)/, "");
+    const customer = Array.from(customerRecords.values()).find(row => normalize(row.whatsapp) === normalize(phone));
+    if (!customer) return;
+    const select = form.elements.namedItem(selectName);
+    if (select && select.value !== customer.id) {
+      select.value = customer.id;
+      fillCustomerFromChoice(form, selectName);
+    }
+  }
+
+  async function loadCustomerChoices() {
+    const rows = await getRows("customers", { select: "id,name,whatsapp,email", order: "name.asc", limit: "1000" });
+    updateCustomerChoices(rows);
+    return rows;
+  }
+
+  function localToday() {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().slice(0, 10);
+  }
+
+  function updateSaleTotal() {
+    const form = $("#sale-form");
+    if (!form) return;
+    const quantity = Number(form.elements.namedItem("quantity").value || 0);
+    const unitPrice = Number(form.elements.namedItem("unitPrice").value || 0);
+    $("#sale-total").textContent = money(quantity * unitPrice);
+  }
 
   function message(id, text, isError = false) {
     const element = document.getElementById(id);
@@ -176,10 +283,10 @@
     $("#staff-role").textContent = roleLabels[staff.role] || "Equipe";
     $$("[data-admin-only]").forEach(button => { button.hidden = staff.role !== "admin"; });
     const allowed = staff.role === "admin"
-      ? ["overview", "orders", "customers", "catalog", "inventory", "warranties", "finance", "team"]
+      ? ["overview", "orders", "customers", "catalog", "inventory", "sales", "warranties", "finance", "team"]
       : staff.role === "technician"
         ? ["overview", "orders", "customers", "warranties"]
-        : ["overview", "orders", "customers", "catalog", "inventory", "warranties"];
+        : ["overview", "orders", "customers", "catalog", "inventory", "sales", "warranties"];
     $$("[data-screen-target]").forEach(button => { button.hidden = !allowed.includes(button.dataset.screenTarget); });
     const customerForm = $("#customer-form");
     if (customerForm) customerForm.hidden = staff.role === "technician";
@@ -289,14 +396,16 @@
           " Você pode acompanhar pelo site aguiarepair.com.br, em Acompanhar OS, usando o número e o código do comprovante."
         ) + '" target="_blank" rel="noopener noreferrer">Avisar no WhatsApp ↗</a>'
       : "—";
+    const deviceDetail = [order.color, order.storage_capacity].filter(Boolean).join(" · ");
     return "<tr><td><strong>" + esc(order.order_number) + "</strong></td><td>" + esc(customer) +
-      "</td><td>" + esc([order.brand, order.model].filter(Boolean).join(" ")) + "</td><td>" + statusCell +
+      "</td><td>" + esc([order.brand, order.model].filter(Boolean).join(" ")) + (deviceDetail ? "<br><small>" + esc(deviceDetail) + "</small>" : "") + "</td><td>" + statusCell +
       "</td><td>" + esc(dateText(order.received_at)) + "</td><td>" + notifyCell + "</td></tr>";
   }
 
   async function loadOrders(target) {
+    await loadCustomerChoices();
     const rows = await getRows("work_orders", {
-      select: "id,order_number,status,brand,model,received_at,customers(name,whatsapp)",
+      select: "id,order_number,status,brand,model,color,storage_capacity,received_at,customers(name,whatsapp)",
       order: "received_at.desc",
       limit: "100"
     });
@@ -345,7 +454,8 @@
   }
 
   async function loadCustomers() {
-    const rows = await getRows("customers", { select: "id,name,whatsapp,email,created_at", order: "created_at.desc", limit: "200" });
+    const rows = await getRows("customers", { select: "id,name,whatsapp,email,created_at", order: "created_at.desc", limit: "1000" });
+    updateCustomerChoices(rows);
     $("#customers-table").innerHTML = table(["Nome", "WhatsApp", "E-mail", "Cadastro"],
       rows.map(row => "<tr><td>" + esc(row.name) + "</td><td>" + esc(row.whatsapp) + "</td><td>" + esc(row.email || "—") + "</td><td>" + esc(dateText(row.created_at)) + "</td></tr>"),
       "Nenhum cliente cadastrado.");
@@ -361,11 +471,38 @@
   }
 
   async function loadInventory() {
-    const rows = await getRows("inventory_items", { select: "id,sku,name,quantity,minimum_quantity,unit_cost", order: "name.asc", limit: "300" });
-    $("#inventory-table").innerHTML = table(["Código", "Item", "Quantidade", "Mínimo", "Custo"],
+    const rows = await getRows("inventory_items", { select: "id,sku,name,quantity,minimum_quantity,unit_cost,sale_price", order: "name.asc", limit: "300" });
+    $("#inventory-table").innerHTML = table(["Código", "Item", "Quantidade", "Mínimo", "Custo", "Venda"],
       rows.map(row => "<tr><td>" + esc(row.sku || "—") + "</td><td>" + esc(row.name) + "</td><td>" + esc(row.quantity) +
-        (Number(row.quantity) <= Number(row.minimum_quantity) ? " · Repor" : "") + "</td><td>" + esc(row.minimum_quantity) + "</td><td>" + esc(money(row.unit_cost)) + "</td></tr>"),
+        (Number(row.quantity) <= Number(row.minimum_quantity) ? " · Repor" : "") + "</td><td>" + esc(row.minimum_quantity) + "</td><td>" + esc(money(row.unit_cost)) + "</td><td>" +
+        (row.sale_price === null ? "—" : esc(money(row.sale_price))) + "</td></tr>"),
       "Nenhum item cadastrado no estoque.");
+  }
+
+  async function loadSales() {
+    const [sales, , inventory] = await Promise.all([
+      getRows("sales", { select: "id,product_name,quantity,unit_price,total_amount,payment_method,occurred_on,customers(name)", order: "created_at.desc", limit: "300" }),
+      loadCustomerChoices(),
+      getRows("inventory_items", { select: "id,name,quantity,sale_price", order: "name.asc", limit: "1000" })
+    ]);
+    const productSelect = $("#sale-product-choice");
+    if (productSelect) {
+      productSelect.replaceChildren(new Option("Selecione um produto do estoque", ""));
+      inventory.forEach(item => {
+        const option = new Option(item.name + " · estoque: " + item.quantity, item.id);
+        option.disabled = Number(item.quantity) < 1;
+        option.dataset.price = item.sale_price ?? "";
+        option.dataset.stock = String(item.quantity);
+        productSelect.add(option);
+      });
+    }
+    const paymentLabels = { pix: "Pix", card: "Cartão", cash: "Dinheiro", transfer: "Transferência", other: "Outro" };
+    $("#sales-table").innerHTML = table(["Data", "Cliente", "Produto", "Qtd.", "Total", "Pagamento"], sales.map(sale =>
+      "<tr><td>" + esc(dateText(sale.occurred_on)) + "</td><td>" + esc(sale.customers?.name || "—") + "</td><td>" + esc(sale.product_name) +
+      "</td><td>" + esc(sale.quantity) + "</td><td>" + esc(money(sale.total_amount)) + "</td><td>" + esc(paymentLabels[sale.payment_method] || sale.payment_method) + "</td></tr>"
+    ), "Nenhuma venda registrada." );
+    const saleForm = $("#sale-form");
+    if (saleForm && !saleForm.elements.namedItem("occurredOn").value) saleForm.elements.namedItem("occurredOn").value = localToday();
   }
 
   async function loadWarranties() {
@@ -403,6 +540,7 @@
       if (name === "customers") await loadCustomers();
       if (name === "catalog") await loadCatalog();
       if (name === "inventory") await loadInventory();
+      if (name === "sales") await loadSales();
       if (name === "warranties") await loadWarranties();
       if (name === "finance") await loadFinance();
       if (name === "team") await loadTeam();
@@ -428,15 +566,20 @@
       throw new Error("Use imagens JPG, PNG ou WebP de até 10 MB cada.");
     }
     let deviceSecret = String(data.get("accessSecret") || "");
+    const selectedBrand = String(data.get("brand") || "");
+    const brand = selectedBrand === "__other__" ? String(data.get("customBrand") || "").trim() : selectedBrand;
     const response = await functionCall("create-work-order", {
       customer: {
+        id: data.get("existingCustomerId") || null,
         name: data.get("customerName"),
-        whatsapp: data.get("customerWhatsapp")
+        whatsapp: data.get("customerWhatsapp"),
+        email: data.get("customerEmail")
       },
       device: {
-        brand: data.get("brand"),
+        brand,
         model: data.get("model"),
         color: data.get("color"),
+        storageCapacity: data.get("storageCapacity"),
         platform: data.get("platform"),
         lockType: data.get("lockType"),
         accessSecret: deviceSecret
@@ -451,6 +594,8 @@
     deviceSecret = "";
     data.set("accessSecret", "");
     form.reset();
+    fillCustomerFromChoice(form, "existingCustomerId");
+    $("#device-brand")?.dispatchEvent(new Event("change"));
     const result = $("#new-order-result");
     result.hidden = false;
     result.innerHTML = "<strong>OS criada: " + esc(response.orderNumber) + "</strong><br>Código para entregar ao cliente: <code>" +
@@ -571,7 +716,8 @@
         sku: String(data.get("sku") || "").trim() || null,
         quantity: Number(data.get("quantity")),
         minimum_quantity: Number(data.get("minimumQuantity")),
-        unit_cost: Number(data.get("unitCost"))
+        unit_cost: Number(data.get("unitCost")),
+        sale_price: data.get("salePrice") === "" ? null : Number(data.get("salePrice"))
       }});
       if (result?.[0]?.id && Number(data.get("quantity")) > 0) {
         await api("/rest/v1/stock_movements", { method: "POST", body: {
@@ -583,8 +729,33 @@
       }
       form.reset();
       message("inventory-message", "Item salvo no estoque.");
-      await loadInventory();
+      await Promise.all([loadInventory(), loadSales()]);
     }, "inventory-message");
+
+    setupForm("sale-form", async form => {
+      const data = new FormData(form);
+      const response = await functionCall("create-product-sale", {
+        customer: {
+          id: data.get("saleCustomerId") || null,
+          name: data.get("customerName"),
+          whatsapp: data.get("customerWhatsapp"),
+          email: data.get("customerEmail")
+        },
+        sale: {
+          inventoryItemId: data.get("inventoryItemId"),
+          quantity: Number(data.get("quantity")),
+          unitPrice: Number(data.get("unitPrice")),
+          paymentMethod: data.get("paymentMethod"),
+          occurredOn: data.get("occurredOn")
+        }
+      });
+      form.reset();
+      fillCustomerFromChoice(form, "saleCustomerId");
+      form.elements.namedItem("occurredOn").value = localToday();
+      updateSaleTotal();
+      message("sale-message", "Venda registrada: " + response.product + " · " + money(response.total) + ". Estoque e financeiro atualizados.");
+      await Promise.all([loadSales(), loadInventory()]);
+    }, "sale-message");
 
     setupForm("warranty-form", async form => {
       const data = new FormData(form);
@@ -719,6 +890,24 @@
   });
 
   setupForms();
+  setupDeviceCatalog();
+  $("#order-customer-choice")?.addEventListener("change", event => fillCustomerFromChoice(event.currentTarget.form, "existingCustomerId"));
+  $("#sale-customer-choice")?.addEventListener("change", event => fillCustomerFromChoice(event.currentTarget.form, "saleCustomerId"));
+  $("#new-order-form")?.elements.namedItem("customerWhatsapp")?.addEventListener("input", event => matchCustomerByWhatsapp(event.currentTarget.form, "existingCustomerId"));
+  $("#sale-form")?.elements.namedItem("customerWhatsapp")?.addEventListener("input", event => matchCustomerByWhatsapp(event.currentTarget.form, "saleCustomerId"));
+  $("#sale-product-choice")?.addEventListener("change", event => {
+    const option = event.currentTarget.selectedOptions[0];
+    const price = $("#sale-form")?.elements.namedItem("unitPrice");
+    const quantity = $("#sale-form")?.elements.namedItem("quantity");
+    if (price) price.value = option?.value ? option.dataset.price ?? "" : "";
+    if (quantity) {
+      quantity.removeAttribute("max");
+      if (option?.value) quantity.max = option.dataset.stock ?? "";
+    }
+    updateSaleTotal();
+  });
+  [$("#sale-form")?.elements.namedItem("quantity"), $("#sale-form")?.elements.namedItem("unitPrice")]
+    .filter(Boolean).forEach(input => input.addEventListener("input", updateSaleTotal));
   if (inviteAccessToken) {
     if (configured) showInviteSetup();
     else showLogin("Banco ainda não conectado.", true);

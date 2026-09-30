@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="assets/portal.css">
   <link rel="stylesheet" href="assets/staff.css">
   <script src="assets/supabase-config.js" defer></script>
+  <script src="assets/device-catalog.js" defer></script>
   <script src="assets/staff-app.js" defer></script>
 </head>
 <body class="simple-home staff-page">
@@ -54,6 +55,7 @@
           <button type="button" data-screen-target="customers">Clientes</button>
           <button type="button" data-screen-target="catalog">Produtos</button>
           <button type="button" data-screen-target="inventory">Estoque</button>
+          <button type="button" data-screen-target="sales">Vendas</button>
           <button type="button" data-screen-target="warranties">Garantias</button>
           <button type="button" data-screen-target="finance" data-admin-only hidden>Financeiro</button>
           <button type="button" data-screen-target="team" data-admin-only hidden>Equipe</button>
@@ -77,12 +79,17 @@
               <summary>Registrar uma nova OS</summary>
               <form id="new-order-form" class="staff-form staff-form-grid">
                 <h3 class="form-section-title">Cliente</h3>
-                <label>Nome<input name="customerName" required maxlength="160"></label>
-                <label>WhatsApp<input name="customerWhatsapp" type="tel" required maxlength="24" autocomplete="off"></label>
+                <label class="span-two">Cliente cadastrado<select name="existingCustomerId" id="order-customer-choice"><option value="">Novo cliente — cadastrar neste atendimento</option></select><small>Escolha na lista ou informe um WhatsApp cadastrado para preencher os dados. Se for novo, preencha abaixo.</small></label>
+                <label>Nome<input name="customerName" required maxlength="160" autocomplete="name"></label>
+                <label>WhatsApp<input name="customerWhatsapp" type="tel" required maxlength="24" autocomplete="tel"></label>
+                <label class="span-two">E-mail (opcional)<input name="customerEmail" type="email" maxlength="200" autocomplete="email"></label>
                 <h3 class="form-section-title">Aparelho</h3>
-                <label>Marca<input name="brand" required maxlength="80"></label>
-                <label>Modelo<input name="model" required maxlength="120"></label>
-                <label>Cor<input name="color" maxlength="80"></label>
+                <label>Marca<select name="brand" id="device-brand" required><option value="">Selecione a marca</option></select><input name="customBrand" id="device-brand-custom" hidden maxlength="80" placeholder="Digite a marca"></label>
+                <label>Modelo<input name="model" list="device-model-list" required maxlength="120" placeholder="Escolha a marca ou digite"></label>
+                <datalist id="device-model-list"></datalist>
+                <label>Cor<input name="color" list="device-color-list" maxlength="80" placeholder="Selecione ou digite"></label>
+                <datalist id="device-color-list"></datalist>
+                <label>Armazenamento<select name="storageCapacity"><option value="">Não informado</option><option>4 GB</option><option>8 GB</option><option>16 GB</option><option>32 GB</option><option>64 GB</option><option>128 GB</option><option>256 GB</option><option>512 GB</option><option>1 TB</option><option>2 TB</option><option>Outro</option></select></label>
                 <label>Sistema<select name="platform"><option value="">Não informado</option><option value="android">Android</option><option value="iphone">iPhone</option><option value="other">Outro</option></select></label>
                 <label>Bloqueio<select name="lockType"><option value="none">Sem bloqueio necessário</option><option value="pin">PIN</option><option value="password">Senha</option><option value="pattern">Padrão Android</option><option value="other">Outro</option></select></label>
                 <label class="span-two">PIN/senha/padrão (opcional)<input name="accessSecret" type="password" autocomplete="new-password" maxlength="200"><small>Quando necessário, o servidor cifra o dado. Ele não aparece nas consultas do cliente.</small></label>
@@ -144,10 +151,31 @@
               <label>Quantidade inicial<input name="quantity" type="number" min="0" step="1" value="0" required></label>
               <label>Estoque mínimo<input name="minimumQuantity" type="number" min="0" step="1" value="0" required></label>
               <label>Custo unitário<input name="unitCost" type="number" min="0" step="0.01" value="0" required></label>
+              <label>Preço de venda (opcional)<input name="salePrice" type="number" min="0" step="0.01"></label>
               <button class="staff-action span-two" type="submit">Salvar item</button>
               <p id="inventory-message" class="staff-message span-two" role="status" aria-live="polite"></p>
             </form>
             <div id="inventory-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando estoque...</p></div>
+          </section>
+
+          <section class="staff-screen" data-screen="sales" hidden>
+            <div class="staff-screen-heading"><div><p class="eyebrow">ATENDIMENTO E ESTOQUE</p><h2>Vender produto</h2></div></div>
+            <form id="sale-form" class="staff-panel staff-form staff-form-grid">
+              <h3 class="form-section-title">Dados da venda</h3>
+              <label class="span-two">Cliente cadastrado<select name="saleCustomerId" id="sale-customer-choice"><option value="">Novo cliente — cadastrar nesta venda</option></select><small>Escolha na lista ou informe um WhatsApp cadastrado para preencher os dados. Se for novo, preencha abaixo.</small></label>
+              <label>Nome<input name="customerName" required maxlength="160" autocomplete="name"></label>
+              <label>WhatsApp<input name="customerWhatsapp" type="tel" required maxlength="24" autocomplete="tel"></label>
+              <label class="span-two">E-mail (opcional)<input name="customerEmail" type="email" maxlength="200" autocomplete="email"></label>
+              <label class="span-two">Produto do estoque<select name="inventoryItemId" id="sale-product-choice" required><option value="">Carregando estoque...</option></select></label>
+              <label>Quantidade<input name="quantity" type="number" min="1" step="1" value="1" required></label>
+              <label>Preço unitário<input name="unitPrice" type="number" min="0" step="0.01" required></label>
+              <label>Pagamento<select name="paymentMethod"><option value="pix">Pix</option><option value="card">Cartão</option><option value="cash">Dinheiro</option><option value="transfer">Transferência</option><option value="other">Outro</option></select></label>
+              <label>Data<input name="occurredOn" type="date" required></label>
+              <p class="sale-total span-two">Total da venda: <strong id="sale-total">R$ 0,00</strong></p>
+              <button class="staff-action span-two" type="submit">Registrar venda e baixar estoque</button>
+              <p id="sale-message" class="staff-message span-two" role="status" aria-live="polite"></p>
+            </form>
+            <div id="sales-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando vendas...</p></div>
           </section>
 
           <section class="staff-screen" data-screen="warranties" hidden>
