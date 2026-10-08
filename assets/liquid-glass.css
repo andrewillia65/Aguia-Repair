@@ -1,0 +1,47 @@
+/* Águia shared theme · same tokens and components on Repair and 3D. */
+:root{color-scheme:light;--aguia-bg:#edf3fb;--aguia-ink:#152b48;--aguia-muted:#435b76;--aguia-blue:#1759cf;--aguia-glass:rgba(255,255,255,.82);--aguia-line:rgba(68,103,151,.22);--aguia-radius:24px;--aguia-shadow:0 16px 48px rgba(24,57,103,.10),inset 0 1px 0 rgba(255,255,255,.95);--aguia-font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--ink:var(--aguia-ink);--muted:var(--aguia-muted);--line:var(--aguia-line);--gold:var(--aguia-blue);--bg:var(--aguia-bg);--white:var(--aguia-ink)}
+body,body.simple-home{font-family:var(--aguia-font);font-size:16px;line-height:1.6;color:var(--aguia-ink);background:radial-gradient(ellipse at 8% 0%,#bcd7ff80,transparent 48%),radial-gradient(ellipse at 100% 35%,#cee7eea0,transparent 50%),var(--aguia-bg);--gold:var(--aguia-blue);--line:var(--aguia-line)}
+h1,h2,h3,h4,button,input,select,textarea{font-family:var(--aguia-font)}
+body :is(.hero,.custom-section,.catalog-section,.whatsapp-section,.feature-section,.how-section,.buying-info,.final-cta,.site-footer,.admin-main){background:transparent;color:var(--aguia-ink)}
+body :is(.hero h1,.custom-section h2,.section-heading h2,.center-head h2,.final-cta h2,.simple-intro h1,.portal-section h2,.portal-heading h1,.staff-login-card h1){color:var(--aguia-ink);font-family:var(--aguia-font);font-weight:750;line-height:1.16;letter-spacing:-.035em;text-shadow:none;-webkit-text-fill-color:currentColor}
+body :is(h1 em,h2 em,.hero h1 em,.simple-intro h1 span){color:var(--aguia-blue);font-family:inherit;font-style:normal;-webkit-text-fill-color:currentColor}
+body :is(.hero p,.hero-micro span,.section-heading p,.center-head p,.final-cta p,.simple-intro>p,.staff-intro,.staff-footnote,.lookup-help,.cart-footer p,.catalog-empty,.cart-empty,.simple-note,.footer-note){color:var(--aguia-muted);font-size:16px;line-height:1.75}
+body :is(.eyebrow,.kicker,.simple-intro .eyebrow,.simple-home .eyebrow){color:var(--aguia-blue);font-size:12px;font-weight:750;line-height:1.6;letter-spacing:.13em}
+body :is(.site-header,.header,.portal-section,.route-card,.product-card,.personalization-card,.custom-category,.whatsapp-project,.buying-info details,.shopping-cart,.staff-login-card,.staff-panel,.staff-metrics article,.staff-sidebar,.admin-panel,.stat-card,.small-dialog,.edit-dialog,.account-card,.model-option,.feature-panel,.locked-card,.access-card,.service-card,.role,.draft-resume,.simple-contact){background:#f9fbff;border:1px solid var(--aguia-line);border-radius:var(--aguia-radius);box-shadow:var(--aguia-shadow);color:var(--aguia-ink)}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){body :is(.site-header,.header,.portal-section,.route-card,.product-card,.personalization-card,.custom-category,.whatsapp-project,.shopping-cart,.staff-login-card,.staff-panel,.staff-metrics article,.staff-sidebar,.admin-panel,.stat-card,.small-dialog,.edit-dialog,.account-card,.feature-panel,.locked-card,.access-card,.service-card,.role,.draft-resume,.simple-contact){background:var(--aguia-glass);backdrop-filter:blur(20px) saturate(135%);-webkit-backdrop-filter:blur(20px) saturate(135%)}}
+body .site-header{border-radius:0 0 24px 24px}body .header{padding:16px 20px;margin-top:16px;min-height:88px}body .simple-header{gap:20px}
+body :is(.desktop-nav a,.nav-link,.navbar .text-button,.header nav>a:not(.button),.staff-public-link,.simple-contact a,.footer a,.site-footer a){color:var(--aguia-ink);font-size:14px;font-weight:600}
+body :is(.brand,.footer-brand){background:#102744;border-radius:16px;padding:8px 14px;box-shadow:inset 0 1px #ffffff30}body .brand-logo{mix-blend-mode:normal}body .simple-hero-logo{background:#102744;border-radius:24px;mix-blend-mode:normal;padding:8px}
+body :is(.btn-dark,.btn-gold,.simple-primary,.simple-home .button,.staff-action,.quote-actions button){background:linear-gradient(145deg,#276cec,#1759cf);border:1px solid #1759cf;color:#fff;border-radius:14px;min-height:46px;font-size:14px;font-weight:700;box-shadow:0 8px 22px #1759cf24}
+body :is(.btn-outline,.btn-outline-light,.button.secondary,.staff-logout,.mobile-menu-toggle){background:#ffffffb8;border:1px solid #7897bd;color:var(--aguia-ink);border-radius:14px;min-height:44px;font-size:14px}
+body :is(.btn,.button,.simple-primary,.staff-action):hover{filter:brightness(.97)}
+body :is(.text-button,.icon-button,.simple-link,.staff-account,.cart-count,.catalog-card-body strong,.price-amount){color:var(--aguia-blue)}
+body :is(.catalog-card,.personalization-card>button,.designer-right,.wizard-footer,.admin-top,.staff-table th){background:#ffffffb8;color:var(--aguia-ink);border-color:var(--aguia-line)}
+body :is(.catalog-card-body h3,.personalization-card-body h3,.personalization-card-body>b,.card-body h3,.route-card h2,.cart-heading h3,.staff-panel h3,.staff-screen-heading h2){color:var(--aguia-ink);font-weight:700}
+body :is(.catalog-card-body p,.personalization-card-body>span,.card-body p,.route-card p,.staff-form small,.staff-table td,.admin-table td,.simple-footer,.footer-main p,.site-footer p){color:var(--aguia-muted);font-size:14px;line-height:1.7}
+body :is(.lookup-form label,.staff-form label,.stack-form label,.edit-form label){color:var(--aguia-ink);font-size:14px}
+body :is(.lookup-form input,.staff-form input,.staff-form select,.staff-form textarea,.stack-form input,.stack-form select,.stack-form textarea,.edit-form input,.edit-form select,.edit-form textarea,.search-box input,.admin-toolbar input,.admin-toolbar select){background:#ffffffed;color:var(--aguia-ink);border:1px solid #8ca7c9;border-radius:12px;font-size:16px;min-height:46px}
+body input::placeholder,body textarea::placeholder{color:#586d86;opacity:1}
+body :is(.lookup-result,.public-quote,.detail-box,.logo-controls,.upload-zone,.nfc-toggle){background:#edf4ff;color:var(--aguia-ink);border-color:#9db8df;border-radius:16px}
+body :is(.lookup-result p,.public-quote h4,.lookup-result ol,.quote-actions button+button){color:var(--aguia-ink)}
+body :is(.lookup-error,.staff-message.is-error){color:#952626;border-color:#b54444;background:#fff1f1}
+body :is(.staff-sidebar button,.staff-tabs button){color:var(--aguia-muted);font-size:14px}body :is(.staff-sidebar button.is-active,.account-tabs button.active,.chip.active){background:#dceaff;color:#164fb3}
+body :is(.staff-table th,.staff-table td,.admin-table th,.admin-table td){border-color:var(--aguia-line)}
+body .hero-bottom{background:#ffffff80;color:var(--aguia-muted);border-color:var(--aguia-line)}
+body :is(.announce,.publication-notice){background:#e1ebfc;color:#21446f;border-color:var(--aguia-line);font-size:12px}
+body .site-footer{border-color:var(--aguia-line)}body .footer-brand-text,body .footer-bottom{color:var(--aguia-muted)}
+body .designer-left,body .admin-sidebar{background:linear-gradient(145deg,#153456,#102744);color:#fff;border:1px solid #6484ad;border-radius:24px}
+body .designer-left :is(.eyebrow,.tiny-eyebrow,.preview-label,.preview-caption,.preview-facts,.icon-button){color:#d5e5fb}body .designer-left .preview-bottom-right strong{color:#fff}
+body .designer-right{border-radius:0 24px 24px 0}body .editor-page{background:transparent;border-radius:24px;box-shadow:var(--aguia-shadow)}
+body :is(.btn,.button,.simple-primary,button,input,select,textarea,a):focus-visible{outline:3px solid #1759cf;outline-offset:3px}
+body :is(button,a)[aria-disabled=true],body button:disabled{opacity:.6}
+@media(max-width:760px){body .header{padding:12px 14px;gap:12px}body .simple-home .header nav{gap:12px;justify-content:flex-start}body .header nav>a:not(.button){font-size:14px}body .portal-section{padding:20px;border-radius:20px}body .designer-right{border-radius:0 0 24px 24px}body .hero h1{font-size:clamp(38px,10vw,48px)}body .staff-public-link{font-size:14px}body .header .brand{padding:6px 10px}body .simple-intro h1{font-size:clamp(36px,9vw,48px)}body .hero-bottom{font-size:12px}}
+@media(prefers-reduced-transparency:reduce){body :is(.site-header,.header,.portal-section,.route-card,.product-card,.personalization-card,.shopping-cart,.staff-panel,.staff-login-card,dialog){background:#f9fbff;backdrop-filter:none;-webkit-backdrop-filter:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+
+/* Keep legacy Repair selectors from weakening contrast on light glass. */
+body.simple-home .header nav>a:not(.button),body.simple-home .simple-contact a,body.simple-home .simple-contact strong,body.simple-home .contact-heading,body.simple-home .footer-brand,body.simple-home .footer-brand strong{color:var(--aguia-ink);font-size:14px}
+body.simple-home .portal-section-heading>p,body.simple-home .simple-footer,body.simple-home .footer-brand p,body.simple-home .footer>div:nth-child(2),body.simple-home .footer>small,body.simple-home .lookup-help,body.simple-home .simple-note{color:var(--aguia-muted);font-size:14px}
+body.simple-home .lookup-form input::placeholder,body.simple-home .staff-form input::placeholder{color:#586d86;opacity:1}
+body.simple-home .lookup-form input:focus,body.simple-home .staff-form input:focus{border-color:var(--aguia-blue);box-shadow:0 0 0 3px #1759cf20}
+body.simple-home .portal-section-heading>p{font-size:16px}
