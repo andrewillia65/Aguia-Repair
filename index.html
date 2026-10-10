@@ -9,15 +9,15 @@
   <link rel="stylesheet" href="assets/site.css">
   <link rel="stylesheet" href="assets/portal.css">
   <script src="assets/supabase-config.js" defer></script>
-  <script src="assets/public-portal.js?v=4" defer></script>
-  <link rel="stylesheet" href="assets/liquid-glass.css?v=1">
+  <script src="assets/public-portal.js?v=5" defer></script>
+  <link rel="stylesheet" href="assets/liquid-glass.css?v=2">
   <link rel="icon" type="image/png" href="assets/aguia-repair-logo.png?v=1">
 </head>
 <body class="simple-home">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
   <header class="header wrap simple-header">
     <a class="brand" href="index.html" aria-label="Águia Repair, início">
-      <img class="brand-logo" src="assets/aguia-repair-logo.png" width="114" height="76" alt="Águia Repair">
+      <img decoding="async" class="brand-logo" src="assets/aguia-repair-logo.png" width="114" height="76" alt="Águia Repair">
     </a>
     <nav aria-label="Acessos">
       <a href="#produtos">Produtos</a>
@@ -30,7 +30,7 @@
 
   <main id="conteudo" class="wrap simple-main">
     <section class="simple-intro" aria-labelledby="welcome-title">
-      <img class="simple-hero-logo" src="assets/aguia-repair-logo.png" width="1536" height="1024" alt="Logotipo da Águia Repair" fetchpriority="high">
+      <img decoding="async" class="simple-hero-logo" src="assets/aguia-repair-logo.png" width="1536" height="1024" alt="Logotipo da Águia Repair" fetchpriority="high">
       <p class="eyebrow">ASSISTÊNCIA TÉCNICA &amp; MICROELETRÔNICA</p>
       <h1 id="welcome-title">Seu atendimento,<br><span>sem complicação.</span></h1>
       <p>Consulte seu reparo, confira a garantia e veja os produtos da Águia Repair. Você não precisa criar uma conta.</p>
@@ -39,11 +39,12 @@
 
     <section id="produtos" class="portal-section" aria-labelledby="products-heading">
       <div class="portal-section-heading"><div><p class="eyebrow">CATÁLOGO ÁGUIA REPAIR</p><h2 id="products-heading">Produtos</h2></div><a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quero%20saber%20quais%20produtos%20est%C3%A3o%20dispon%C3%ADveis." target="_blank" rel="noopener noreferrer">Perguntar no WhatsApp <span aria-hidden="true">↗</span></a></div>
+      <div class="catalog-tools"><label>Buscar produto<input id="repairCatalogSearch" type="search" placeholder="Nome ou descrição" maxlength="150"></label><label>Ordenar<select id="repairCatalogSort"><option value="default">Ordem da loja</option><option value="name">Nome</option><option value="price">Menor preço informado</option></select></label></div><p id="repairCatalogCount" class="hint" role="status"></p>
       <div id="catalog-grid" class="catalog-grid" aria-live="polite"><p class="catalog-empty">O catálogo está sendo conectado. Se precisar, fale com a equipe pelo WhatsApp.</p></div>
       <section id="shopping-cart" class="shopping-cart" aria-labelledby="cart-heading">
         <div class="cart-heading"><div><p class="eyebrow">SEU PEDIDO</p><h3 id="cart-heading">Carrinho</h3></div><span id="cart-count" class="cart-count">0 itens</span></div>
         <div id="cart-items" class="cart-items" aria-live="polite"><p class="cart-empty">Seu carrinho está vazio.</p></div>
-        <div class="cart-footer"><div><strong id="cart-total">Total: R$ 0,00</strong><p>Disponibilidade, preço e entrega serão confirmados pelo WhatsApp.</p></div><button id="checkout-whatsapp" class="simple-primary" type="button" disabled>Continuar pelo WhatsApp <span aria-hidden="true">↗</span></button></div>
+        <div class="quote-options"><label>Como receber?<select id="repairDelivery"><option>A combinar</option><option>Retirada</option><option>Consultar envio</option></select></label><label>Cidade / UF (opcional)<input id="repairCity" maxlength="70" placeholder="Ex.: Vitória / ES"></label><label>Observações (opcional)<textarea id="repairNotes" rows="2" maxlength="500" placeholder="Informe detalhes ou dúvidas sobre os produtos"></textarea></label></div><div class="cart-footer"><div><strong id="cart-total">Total: R$ 0,00</strong><p>Disponibilidade, preço e entrega serão confirmados pelo WhatsApp.</p></div><button id="checkout-whatsapp" class="simple-primary" type="button" disabled>Conferir pedido</button></div>
       </section>
     </section>
 
@@ -79,5 +80,6 @@
     <span>ÁGUIA REPAIR</span>
     <span>Assistência técnica & microeletrônica</span>
   </footer>
+<dialog id="repairQuoteDialog" class="quote-dialog"><div class="quote-dialog-inner"><div class="quote-heading"><h2>Confira seu pedido</h2><button type="button" id="repairQuoteClose" aria-label="Fechar resumo">✕</button></div><p>Confira os itens e a entrega. Preço, disponibilidade e frete serão confirmados pela equipe. A mensagem só será enviada por você no WhatsApp.</p><label>Resumo<textarea id="repairQuoteSummary" rows="12" readonly></textarea></label><div class="quote-actions"><button id="repairQuoteCopy" type="button">Copiar resumo</button><a id="repairQuoteSend" class="simple-primary" target="_blank" rel="noopener noreferrer">Abrir WhatsApp</a></div><p id="repairCopyStatus" role="status"></p></div></dialog>
 </body>
 </html>

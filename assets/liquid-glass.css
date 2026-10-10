@@ -45,3 +45,19 @@ body.simple-home .portal-section-heading>p,body.simple-home .simple-footer,body.
 body.simple-home .lookup-form input::placeholder,body.simple-home .staff-form input::placeholder{color:#586d86;opacity:1}
 body.simple-home .lookup-form input:focus,body.simple-home .staff-form input:focus{border-color:var(--aguia-blue);box-shadow:0 0 0 3px #1759cf20}
 body.simple-home .portal-section-heading>p{font-size:16px}
+
+/* Free tools, catalog and quote review shared by both sites. */
+body :is(.catalog-tools,.quote-options){display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+body :is(.catalog-tools label,.quote-options label,.summary-label,.quote-dialog label){display:grid;gap:8px;font-size:14px;font-weight:650;color:var(--aguia-ink)}
+body :is(.catalog-tools input,.catalog-tools select,.quote-options input,.quote-options select,.quote-options textarea,#quoteSummary,#repairQuoteSummary){width:100%;min-width:0;min-height:46px;border:1px solid #8ca7c9;border-radius:12px;padding:12px;background:#fff;color:var(--aguia-ink);font:inherit;font-size:16px}
+body .quote-options label:last-child{grid-column:1/-1}body :is(#quoteSummary,#repairQuoteSummary){line-height:1.65;resize:vertical}
+body .quote-dialog{width:min(640px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflow:auto;border:1px solid var(--aguia-line);border-radius:24px;background:#f9fbff;color:var(--aguia-ink);box-shadow:var(--aguia-shadow);padding:0}
+body .quote-dialog::backdrop{background:#10274499;backdrop-filter:blur(5px)}body .quote-dialog-inner{padding:24px}body .quote-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}body .quote-heading h2{margin:0;font-size:24px}body .quote-heading button{min-width:44px;min-height:44px;background:#fff;border:1px solid #8ca7c9;border-radius:12px;color:var(--aguia-ink)}
+body .quote-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}body .quote-actions .simple-primary{margin-top:0}body .quote-actions button{background:#fff;border-color:#8ca7c9;color:var(--aguia-ink)}
+body :is(.hint,.field-tip,.stock-note,.personalization-card-body small,.product-info p,.product-info summary,.card-category,.price-label){font-size:14px;line-height:1.65;color:var(--aguia-muted)}
+body :is(.btn,.card-action,.text-button,.cart-add-button,.cart-controls button,.chip,.nav-link){min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+body .cart-controls button{min-width:44px}body .cart-controls{flex-wrap:wrap}body .wizard-footer{gap:12px}body .ai-actions{flex-wrap:wrap}
+body .catalog-photo{aspect-ratio:4/3;display:grid;place-items:center;background:#e5edfa;overflow:hidden;color:var(--aguia-muted)}body .catalog-photo img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/3}body .catalog-photo img[hidden]{display:none}body .photo-placeholder{min-height:140px;display:grid;place-items:center;text-align:center;padding:20px;color:var(--aguia-muted);background:#e5edfa;font-size:14px}
+body :is(.personalization-card,.product-card,.catalog-card){content-visibility:auto;contain-intrinsic-size:auto 520px}
+body :is(.catalog-photo,.card-art,.personalization-card)>img{height:auto;max-width:100%}body .catalog-photo>img{height:100%}
+@media(max-width:760px){body :is(.catalog-tools,.quote-options){grid-template-columns:1fr}body .quote-dialog-inner{padding:20px}body .quote-actions>*{flex:1 1 180px}body .quote-heading h2{font-size:22px}body .catalog-card{display:flex;flex-direction:column}body .catalog-card .catalog-photo{width:100%}body .catalog-card-body{padding:20px}body .cart-row{gap:12px;flex-wrap:wrap}body .cart-row>div{min-width:0}body .cart-item-title{overflow-wrap:anywhere}}

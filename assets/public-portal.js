@@ -8,6 +8,7 @@
   const storeWhatsApp = "5527998784657";
   let quoteCredentials = null;
   let catalogById = new Map();
+  let catalogItems = [];
   let cartQuantities = loadCart();
 
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({
@@ -100,11 +101,41 @@
       const lines = ["Olá! Quero pedir pelo site da Águia Repair:", "", ...entries.map(({ item, quantity }) => {
         const lineTotal = item.price === null || item.price === "" ? "preço a confirmar" : formatMoney(Number(item.price) * quantity);
         return `• ${item.name} — ${quantity} un. — ${lineTotal}`;
-      }), "", hasUnpricedItems ? `Subtotal dos itens com preço informado: ${formatMoney(subtotal)}. Há preço(s) a confirmar.` : `Total dos produtos: ${formatMoney(subtotal)}.`, "Por favor, confirme disponibilidade e combine a entrega/retirada."];
-      window.location.href = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(lines.join("\n"))}`;
+      }), "", hasUnpricedItems ? `Subtotal dos itens com preço informado: ${formatMoney(subtotal)}. Há preço(s) a confirmar.` : `Total dos produtos: ${formatMoney(subtotal)}.`, `Entrega: ${document.querySelector("#repairDelivery")?.value || "A combinar"}`, `Cidade: ${document.querySelector("#repairCity")?.value.trim() || "A combinar"}`, `Observações: ${document.querySelector("#repairNotes")?.value.trim() || "Sem observações"}`, "Por favor, confirme disponibilidade, preço final e frete antes do pagamento."];
+      const message = lines.join("\n");
+      const dialog = document.querySelector("#repairQuoteDialog");
+      if (!dialog) { window.location.href = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(message)}`; return; }
+      document.querySelector("#repairQuoteSummary").value = message;
+      document.querySelector("#repairQuoteSend").href = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(message)}`;
+      document.querySelector("#repairCopyStatus").textContent = "";
+      dialog.showModal();
     });
     renderCart();
   }
+
+  const normalizeSearch = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
+  function renderCatalogCards() {
+    const grid=document.querySelector("#catalog-grid");if(!grid)return;
+    const search=normalizeSearch(document.querySelector("#repairCatalogSearch")?.value);
+    const mode=document.querySelector("#repairCatalogSort")?.value;
+    let filtered=catalogItems.filter(item=>normalizeSearch(item.name+" "+item.description).includes(search));
+    if(mode==="name")filtered.sort((a,b)=>a.name.localeCompare(b.name,"pt-BR"));
+    if(mode==="price")filtered.sort((a,b)=>(a.price==null?Infinity:Number(a.price))-(b.price==null?Infinity:Number(b.price)));
+    const count=document.querySelector("#repairCatalogCount");if(count)count.textContent=`${filtered.length} de ${catalogItems.length} produto(s)`;
+    grid.innerHTML=filtered.length?filtered.map(item=>{
+      let photo="";try{const u=new URL(item.image_url);if(u.protocol==="https:"&&!u.username&&!u.password)photo=u.href;}catch{}
+      const image=photo?`<div class="catalog-photo"><img src="${escapeHtml(photo)}" alt="Foto de ${escapeHtml(item.name)}" width="640" height="480" loading="lazy" decoding="async" referrerpolicy="no-referrer"><span hidden>Foto em atualização</span></div>`:'<div class="catalog-photo photo-placeholder">Foto em atualização</div>';
+      const price=item.price==null||item.price===""?"Preço sob consulta":formatMoney(Number(item.price));
+      return `<article class="catalog-card">${image}<div class="catalog-card-body"><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.description)}</p><p class="catalog-price">${price}</p><details class="product-info"><summary>Detalhes e disponibilidade</summary><p>${escapeHtml(item.description||"Peça informações à equipe.")}</p><p>Medidas, material, disponibilidade e garantia: confirme com a equipe antes de comprar.</p></details><button class="cart-add-button" type="button" data-cart-add="${escapeHtml(item.id)}" aria-label="Adicionar ${escapeHtml(item.name)} ao carrinho">Adicionar ao carrinho</button></div></article>`;
+    }).join(""):'<p class="catalog-empty">Nenhum produto encontrado. Tente outro nome ou limpe a busca.</p>';
+  }
+  document.querySelector("#repairCatalogSearch")?.addEventListener("input",renderCatalogCards);
+  document.querySelector("#repairCatalogSort")?.addEventListener("change",renderCatalogCards);
+  document.querySelector("#catalog-grid")?.addEventListener("error",event=>{const img=event.target;if(img.tagName==="IMG"){img.hidden=true;const text=img.nextElementSibling;if(text)text.hidden=false;}},true);
+  const quoteDialog=document.querySelector("#repairQuoteDialog");
+  document.querySelector("#repairQuoteClose")?.addEventListener("click",()=>quoteDialog.close());
+  quoteDialog?.addEventListener("click",event=>{if(event.target===quoteDialog)quoteDialog.close();});
+  document.querySelector("#repairQuoteCopy")?.addEventListener("click",async()=>{const field=document.querySelector("#repairQuoteSummary");try{await navigator.clipboard.writeText(field.value);document.querySelector("#repairCopyStatus").textContent="Resumo copiado.";}catch{field.focus();field.select();document.querySelector("#repairCopyStatus").textContent="Selecione e copie o resumo para enviar.";}});
 
   async function loadCatalog() {
     const grid = document.querySelector("#catalog-grid");
@@ -130,11 +161,8 @@
       catalogById = new Map(items.map(item => [String(item.id), item]));
       cartQuantities = new Map(Array.from(cartQuantities).filter(([id]) => catalogById.has(id)));
       saveCart();
-      grid.innerHTML = items.map(item => {
-        const image = item.image_url ? `<img src="${escapeHtml(item.image_url)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : "";
-        const price = item.price === null ? '<p class="catalog-price">Consulte o preço</p>' : `<p class="catalog-price">${formatMoney(Number(item.price))}</p>`;
-        return `<article class="catalog-card">${image}<div class="catalog-card-body"><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.description)}</p>${price}<button class="cart-add-button" type="button" data-cart-add="${escapeHtml(item.id)}" aria-label="Adicionar ${escapeHtml(item.name)} ao carrinho">Adicionar ao carrinho</button></div></article>`;
-      }).join("");
+      catalogItems = items;
+      renderCatalogCards();
       renderCart();
     } catch {
       grid.innerHTML = '<p class="catalog-empty">O catálogo está temporariamente indisponível. <a href="https://wa.me/5527998784657" target="_blank" rel="noopener noreferrer">Fale com a equipe ↗</a></p>';
