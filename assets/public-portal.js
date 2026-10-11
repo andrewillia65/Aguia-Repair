@@ -120,7 +120,7 @@
     const mode=document.querySelector("#repairCatalogSort")?.value;
     let filtered=catalogItems.filter(item=>normalizeSearch(item.name+" "+item.description).includes(search));
     if(mode==="name")filtered.sort((a,b)=>a.name.localeCompare(b.name,"pt-BR"));
-    if(mode==="price")filtered.sort((a,b)=>(a.price==null?Infinity:Number(a.price))-(b.price==null?Infinity:Number(b.price)));
+    if(mode==="price"){const priceValue=item=>item.price==null||item.price===""||!Number.isFinite(Number(item.price))?Infinity:Number(item.price);filtered.sort((a,b)=>priceValue(a)-priceValue(b));}
     const count=document.querySelector("#repairCatalogCount");if(count)count.textContent=`${filtered.length} de ${catalogItems.length} produto(s)`;
     grid.innerHTML=filtered.length?filtered.map(item=>{
       let photo="";try{const u=new URL(item.image_url);if(u.protocol==="https:"&&!u.username&&!u.password)photo=u.href;}catch{}
@@ -198,7 +198,7 @@
     if (!form || !result) return;
     form.addEventListener("submit", async event => {
       event.preventDefault();
-      quoteCredentials = null;
+      if (type === "order") quoteCredentials = null;
       result.classList.remove("lookup-error");
       if (!isConfigured) {
         setMessage(result, "A consulta online está sendo conectada. Enquanto isso, fale com a equipe pelo WhatsApp.");
