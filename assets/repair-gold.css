@@ -45,3 +45,12 @@ body .simple-footer{display:flex;align-items:center;justify-content:space-betwee
 /* Supera as regras antigas de mistura em fundo escuro. */
 body.simple-home .brand-logo,body .staff-header .brand-logo{width:215px;max-width:40vw;height:auto;max-height:none;mix-blend-mode:normal;filter:none;opacity:1}
 @media(max-width:760px){body.simple-home .brand-logo{width:205px;max-width:70vw}body .staff-header .brand-logo{width:170px;max-width:45vw}}
+
+/* Contraste da marca prateada, sem caixa individual atrás da logo. */
+body.simple-home .header,body .staff-header{background:#232421;border-color:#414039;box-shadow:0 8px 24px #1c1c1810}
+body.simple-home .header nav>a:not(.button),body .staff-header .staff-public-link{color:#efeee8}
+body.simple-home .header .button.compact{color:#ead3a0;border-color:#706448;background:transparent}
+body.simple-home .header .brand-logo{width:280px;max-width:43vw;mix-blend-mode:normal;filter:none}
+body.simple-home .simple-footer{background:#232421;border:0;border-radius:18px;padding:26px;color:#d4d2c8}
+body .repair-footer-logo{width:240px}
+@media(max-width:760px){body.simple-home .header .brand-logo{width:270px;max-width:82vw}body.simple-home .header nav{border-color:#49483e}body .repair-footer-logo{width:230px}}
