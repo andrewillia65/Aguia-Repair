@@ -65,3 +65,8 @@ body :is(.catalog-photo,.card-art,.personalization-card)>img{height:auto;max-wid
 /* Marca oficial: tamanho legível e proporção original em qualquer tela. */
 body .brand-logo{width:clamp(140px,20vw,210px);max-width:42vw;max-height:none;height:auto;aspect-ratio:878/207;object-fit:contain}
 body .simple-hero-logo{width:420px;max-width:90%;height:auto;aspect-ratio:878/207;object-fit:contain}
+
+/* Marca sem placa de fundo, preservando a transparência do PNG. */
+body :is(.brand,.footer-brand,.simple-hero-logo){background:transparent;border:0;border-radius:0;box-shadow:none;padding:0}
+body .header .brand{padding:0}
+body :is(.brand-logo,.simple-hero-logo){background:transparent;mix-blend-mode:normal;filter:none}
