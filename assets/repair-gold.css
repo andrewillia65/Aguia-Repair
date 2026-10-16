@@ -54,3 +54,5 @@ body.simple-home .header .brand-logo{width:280px;max-width:43vw;mix-blend-mode:n
 body.simple-home .simple-footer{background:#232421;border:0;border-radius:18px;padding:26px;color:#d4d2c8}
 body .repair-footer-logo{width:240px}
 @media(max-width:760px){body.simple-home .header .brand-logo{width:270px;max-width:82vw}body.simple-home .header nav{border-color:#49483e}body .repair-footer-logo{width:230px}}
+
+body.simple-home header.header,body header.staff-header{background:#232421!important}body.simple-home header.header .brand-logo{width:280px;max-width:43vw}@media(max-width:760px){body.simple-home header.header .brand-logo{max-width:82vw;width:270px}}
