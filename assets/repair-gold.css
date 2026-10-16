@@ -68,3 +68,5 @@ body.simple-home .repair-menu nav a{display:flex;align-items:center;min-height:4
 body.simple-home .repair-menu nav a:hover{background:#3b392d;color:#ffe0a0}
 body .repair-menu:not([open]) nav{display:none!important}
 @media(max-width:760px){body.simple-home header.header{flex-wrap:wrap;gap:16px}body.simple-home header.header .brand-logo{width:250px;max-width:78vw}.repair-header-actions{width:100%;justify-content:space-between}.repair-header-actions .brand-switch{flex:1}.repair-menu nav{border-top:1px solid #585548}}
+
+body.simple-home header.header{z-index:200;isolation:isolate}
