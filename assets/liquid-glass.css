@@ -61,3 +61,7 @@ body .catalog-photo{aspect-ratio:4/3;display:grid;place-items:center;background:
 body :is(.personalization-card,.product-card,.catalog-card){content-visibility:auto;contain-intrinsic-size:auto 520px}
 body :is(.catalog-photo,.card-art,.personalization-card)>img{height:auto;max-width:100%}body .catalog-photo>img{height:100%}
 @media(max-width:760px){body :is(.catalog-tools,.quote-options){grid-template-columns:1fr}body .quote-dialog-inner{padding:20px}body .quote-actions>*{flex:1 1 180px}body .quote-heading h2{font-size:22px}body .catalog-card{display:flex;flex-direction:column}body .catalog-card .catalog-photo{width:100%}body .catalog-card-body{padding:20px}body .cart-row{gap:12px;flex-wrap:wrap}body .cart-row>div{min-width:0}body .cart-item-title{overflow-wrap:anywhere}}
+
+/* Marca oficial: tamanho legível e proporção original em qualquer tela. */
+body .brand-logo{width:clamp(140px,20vw,210px);max-width:42vw;max-height:none;height:auto;aspect-ratio:878/207;object-fit:contain}
+body .simple-hero-logo{width:420px;max-width:90%;height:auto;aspect-ratio:878/207;object-fit:contain}
