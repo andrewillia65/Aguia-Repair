@@ -12,7 +12,9 @@
   <script src="assets/public-portal.js?v=5" defer></script>
   <link rel="stylesheet" href="assets/liquid-glass.css?v=3">
   <link rel="icon" type="image/png" href="assets/aguia-repair-logo-2026.png?v=1">
-  <link rel="stylesheet" href="assets/repair-gold.css?v=6">
+  <link rel="stylesheet" href="assets/repair-gold.css?v=7">
+  <link rel="stylesheet" href="assets/layout-refinements.css?v=1">
+  <script src="assets/layout-refinements.js?v=1" defer></script>
 </head>
 <body class="simple-home">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
@@ -20,12 +22,12 @@
     <a class="brand" href="index.html" aria-label="Águia Repair, início">
       <img decoding="async" class="brand-logo" src="assets/aguia-repair-logo-2026.png" width="878" height="207" alt="Águia Repair">
     </a>
-    <div class="repair-header-actions"><a class="brand-switch" href="https://3d.aguiarepair.com.br">Ir para Águia 3D ↗</a><details class="repair-menu"><summary aria-label="Abrir menu de navegação"><span class="hamburger-lines" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span></summary>    <nav aria-label="Acessos">
+    <div class="repair-header-actions"><a aria-label="Ir para Águia 3D" class="brand-switch" href="https://3d.aguiarepair.com.br"><span class="switch-full">Ir para Águia 3D ↗</span><span class="switch-short" aria-hidden="true">Águia 3D ↗</span></a><details class="repair-menu"><summary aria-label="Abrir menu de navegação"><span class="hamburger-lines" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span></summary>    <nav aria-label="Acessos"><span class="menu-group-label">◇ Comprar</span>
       <a href="#produtos">Produtos</a>
-      <a href="#manutencao">Manutenção</a>
+      <span class="menu-group-label">⌁ Atendimento</span><a href="#manutencao">Manutenção</a>
       <a href="#orcamento">Orçamento</a>
       <a href="#consulta-os">Minha OS</a>
-      <a class="button compact" href="funcionario.html">Área da equipe</a>
+      <span class="menu-group-label">○ Minha conta</span><a class="button compact" href="funcionario.html">Área da equipe</a>
     </nav></details></div>
   </header>
 
@@ -40,23 +42,24 @@
       <svg class="repair-device" viewBox="0 0 400 300" fill="none" role="img" aria-label="Ilustração de um celular e circuitos eletrônicos"><defs><linearGradient id="phone-gold" x1="90" y1="30" x2="310" y2="280" gradientUnits="userSpaceOnUse"><stop stop-color="#f8d476"/><stop offset="1" stop-color="#9b6a1a"/></linearGradient></defs><g stroke="#d8b157" stroke-opacity=".3"><path d="M18 108h78m-44 0v70h42M304 92h60v76h-47M298 213h58M46 231h55"/><circle cx="18" cy="108" r="4"/><circle cx="356" cy="213" r="4"/><circle cx="46" cy="231" r="4"/><circle cx="364" cy="92" r="4"/></g><g transform="rotate(12 200 150)"><rect x="126" y="18" width="150" height="266" rx="25" fill="#191a1b" stroke="url(#phone-gold)" stroke-width="3"/><rect x="135" y="28" width="132" height="246" rx="19" fill="#252626"/><path d="M179 37h44" stroke="#a0a0a0" stroke-width="5" stroke-linecap="round"/><rect x="168" y="102" width="67" height="83" rx="12" stroke="#e5bc60" stroke-width="2"/><path d="M189 122v44m15-44v44m15-44v44M178 137h48m-48 14h48" stroke="#e5bc60" stroke-opacity=".5"/><path d="M181 94v-9m15 9v-9m15 9v-9m15 9v-9m-45 116v-9m15 9v-9m15 9v-9m15 9v-9M159 118h-9m9 16h-9m9 16h-9m9 16h-9m94-48h9m-9 16h9m-9 16h9m-9 16h9" stroke="#e5bc60" stroke-width="2"/><circle cx="201" cy="245" r="4" fill="#dfb85c"/></g></svg>
       <div class="repair-feature-bottom"><div><small>DO DIAGNÓSTICO AO REPARO</small><h2>Assistência técnica<br>&amp; microeletrônica.</h2></div><a href="#manutencao" aria-label="Conhecer serviços de manutenção">↗</a></div></aside>
     </section>
-    <section id="manutencao" class="repair-services" aria-labelledby="services-heading"><div class="repair-section-title"><div><p class="eyebrow">CUIDADO COM O QUE É SEU</p><h2 id="services-heading">Como podemos ajudar?</h2></div><p>Conte o que aconteceu com seu aparelho. A gente começa pela avaliação.</p></div><div class="repair-service-grid">
-<a class="repair-service" href="https://wa.me/5527998784657?text=Ol%C3%A1%21%20Preciso%20de%20atendimento%20para%20tela%20e%20bateria." target="_blank" rel="noopener noreferrer"><span class="repair-service-number">01</span><h3>Tela e bateria</h3><p>Troca de tela, touch e bateria para celulares e tablets.</p><span class="repair-service-link">Falar com a equipe ↗</span></a><a class="repair-service" href="https://wa.me/5527998784657?text=Ol%C3%A1%21%20Preciso%20de%20atendimento%20para%20carga%20e%20funcionamento." target="_blank" rel="noopener noreferrer"><span class="repair-service-number">02</span><h3>Carga e funcionamento</h3><p>Aparelho que não liga, não carrega ou reinicia.</p><span class="repair-service-link">Falar com a equipe ↗</span></a><a class="repair-service" href="https://wa.me/5527998784657?text=Ol%C3%A1%21%20Preciso%20de%20atendimento%20para%20placa%20e%20microeletr%C3%B4nica." target="_blank" rel="noopener noreferrer"><span class="repair-service-number">03</span><h3>Placa e microeletrônica</h3><p>Diagnóstico e avaliação de falhas na placa do aparelho.</p><span class="repair-service-link">Falar com a equipe ↗</span></a></div></section>
-
     <section id="produtos" class="portal-section" aria-labelledby="products-heading">
-      <div class="portal-section-heading"><div><p class="eyebrow">PRODUTOS PARA SUA ROTINA</p><h2 id="products-heading">Encontre seu próximo acessório.</h2></div><a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quero%20saber%20quais%20produtos%20est%C3%A3o%20dispon%C3%ADveis." target="_blank" rel="noopener noreferrer">Perguntar no WhatsApp <span aria-hidden="true">↗</span></a></div>
+      <div class="portal-section-heading"><div><p class="eyebrow">PRODUTOS PARA SUA ROTINA</p><h2 id="products-heading">Produtos em destaque.</h2></div><a class="simple-link" href="https://wa.me/5527998784657?text=Ol%C3%A1%2C%20quero%20saber%20quais%20produtos%20est%C3%A3o%20dispon%C3%ADveis." target="_blank" rel="noopener noreferrer">Perguntar no WhatsApp <span aria-hidden="true">↗</span></a></div>
       <div class="catalog-tools"><label>Buscar produto<input id="repairCatalogSearch" type="search" placeholder="Nome ou descrição" maxlength="150"></label><label>Ordenar<select id="repairCatalogSort"><option value="default">Ordem da loja</option><option value="name">Nome</option><option value="price">Menor preço informado</option></select></label></div><p id="repairCatalogCount" class="hint" role="status"></p>
       <div id="catalog-grid" class="catalog-grid" aria-live="polite"><p class="catalog-empty">O catálogo está sendo conectado. Se precisar, fale com a equipe pelo WhatsApp.</p></div>
-      <section id="shopping-cart" class="shopping-cart" aria-labelledby="cart-heading">
+      <details class="repair-cart-details" id="repairCartDetails"><summary>Ver carrinho e finalizar pedido <span aria-hidden="true">↓</span></summary><section id="shopping-cart" class="shopping-cart" aria-labelledby="cart-heading">
         <div class="cart-heading"><div><p class="eyebrow">SEU PEDIDO</p><h3 id="cart-heading">Carrinho</h3></div><span id="cart-count" class="cart-count">0 itens</span></div>
         <div id="cart-items" class="cart-items" aria-live="polite"><p class="cart-empty">Seu carrinho está vazio.</p></div>
         <div class="quote-options"><label>Como receber?<select id="repairDelivery"><option>A combinar</option><option>Retirada</option><option>Consultar envio</option></select></label><label>Cidade / UF (opcional)<input id="repairCity" maxlength="70" placeholder="Ex.: Vitória / ES"></label><label>Observações (opcional)<textarea id="repairNotes" rows="2" maxlength="500" placeholder="Informe detalhes ou dúvidas sobre os produtos"></textarea></label></div><div class="cart-footer"><div><strong id="cart-total">Total: R$ 0,00</strong><p>Disponibilidade, preço e entrega serão confirmados pelo WhatsApp.</p></div><button id="checkout-whatsapp" class="simple-primary" type="button" disabled>Conferir pedido</button></div>
-      </section>
+      </section></details>
     </section>
+
+    <section id="manutencao" class="repair-services" aria-labelledby="services-heading"><div class="repair-section-title"><div><p class="eyebrow">CUIDADO COM O QUE É SEU</p><h2 id="services-heading">Como podemos ajudar?</h2></div><p>Conte o que aconteceu com seu aparelho. A gente começa pela avaliação.</p></div><div class="repair-service-grid">
+<a class="repair-service" href="https://wa.me/5527998784657?text=Ol%C3%A1%21%20Preciso%20de%20atendimento%20para%20tela%20e%20bateria." target="_blank" rel="noopener noreferrer"><span class="repair-service-number">01</span><h3>Tela e bateria</h3><p>Troca de tela, touch e bateria para celulares e tablets.</p><span class="repair-service-link">Falar com a equipe ↗</span></a><a class="repair-service" href="https://wa.me/5527998784657?text=Ol%C3%A1%21%20Preciso%20de%20atendimento%20para%20carga%20e%20funcionamento." target="_blank" rel="noopener noreferrer"><span class="repair-service-number">02</span><h3>Carga e funcionamento</h3><p>Aparelho que não liga, não carrega ou reinicia.</p><span class="repair-service-link">Falar com a equipe ↗</span></a><a class="repair-service" href="https://wa.me/5527998784657?text=Ol%C3%A1%21%20Preciso%20de%20atendimento%20para%20placa%20e%20microeletr%C3%B4nica." target="_blank" rel="noopener noreferrer"><span class="repair-service-number">03</span><h3>Placa e microeletrônica</h3><p>Diagnóstico e avaliação de falhas na placa do aparelho.</p><span class="repair-service-link">Falar com a equipe ↗</span></a></div></section>
 
     <section id="orcamento" class="repair-budget" aria-labelledby="budget-heading"><div><p class="eyebrow">VAMOS RESOLVER?</p><h2 id="budget-heading">Seu próximo passo é simples.</h2><p>Informe o modelo do aparelho e o que está acontecendo. Se puder, envie uma foto ou um vídeo pelo WhatsApp para ajudar na avaliação.</p></div><div class="repair-budget-action"><a class="simple-primary" href="https://wa.me/5527998784657?text=Ol%C3%A1!%20Quero%20solicitar%20um%20or%C3%A7amento%20de%20manuten%C3%A7%C3%A3o.%20Modelo%20do%20aparelho%3A%20%0AProblema%3A%20" target="_blank" rel="noopener noreferrer">Solicitar orçamento ↗</a><span>Valor e prazo após avaliação do aparelho.</span></div></section>
     <div class="repair-aftercare-heading"><p class="eyebrow">JÁ ESTÁ COM A GENTE?</p><h2>Acompanhe seu atendimento.</h2><p>Consulte sua ordem de serviço, veja o orçamento e confira a garantia.</p></div>
-    <section id="consulta-os" class="portal-section portal-query" aria-labelledby="os-heading">
+    <div class="aftercare-tabs" role="tablist" aria-label="Consultar atendimento"><button type="button" role="tab" id="tab-order" aria-controls="consulta-os" aria-selected="true" data-aftercare="consulta-os">OS e orçamento</button><button type="button" role="tab" id="tab-warranty" aria-controls="garantia" aria-selected="false" tabindex="-1" data-aftercare="garantia">Garantia</button></div>
+    <section id="consulta-os" role="tabpanel" aria-labelledby="tab-order" class="portal-section portal-query" aria-labelledby="os-heading">
       <div class="portal-section-heading"><div><p class="eyebrow">SEM CADASTRO</p><h2 id="os-heading">Acompanhe seu reparo</h2></div><p>Informe a OS e os 4 últimos dígitos do WhatsApp cadastrado na loja.</p></div>
       <form id="order-lookup-form" class="lookup-form">
         <label>Número da OS<input name="orderNumber" autocomplete="off" placeholder="Ex.: AR-001234" required maxlength="20"></label>
@@ -67,7 +70,7 @@
       <p class="lookup-help">Use o WhatsApp informado ao abrir a OS. A consulta não mostra telefone, observações internas ou senha do aparelho.</p>
     </section>
 
-    <section id="garantia" class="portal-section" aria-labelledby="warranty-heading">
+    <section id="garantia" role="tabpanel" aria-labelledby="tab-warranty" hidden class="portal-section" aria-labelledby="warranty-heading">
       <div class="portal-section-heading"><div><p class="eyebrow">SEU SERVIÇO</p><h2 id="warranty-heading">Informações de garantia</h2></div><p>Use o número da OS ou da garantia e os 4 últimos dígitos do WhatsApp cadastrado.</p></div>
       <form id="warranty-lookup-form" class="lookup-form">
         <label>Número da OS ou garantia<input name="orderNumber" autocomplete="off" placeholder="Ex.: AR-001234 ou GAR-001001" required maxlength="20"></label>
@@ -89,5 +92,6 @@
     <span>Assistência técnica & microeletrônica</span>
   </footer>
 <dialog id="repairQuoteDialog" class="quote-dialog"><div class="quote-dialog-inner"><div class="quote-heading"><h2>Confira seu pedido</h2><button type="button" id="repairQuoteClose" aria-label="Fechar resumo">✕</button></div><p>Confira os itens e a entrega. Preço, disponibilidade e frete serão confirmados pela equipe. A mensagem só será enviada por você no WhatsApp.</p><label>Resumo<textarea id="repairQuoteSummary" rows="12" readonly></textarea></label><div class="quote-actions"><button id="repairQuoteCopy" type="button">Copiar resumo</button><a id="repairQuoteSend" class="simple-primary" target="_blank" rel="noopener noreferrer">Abrir WhatsApp</a></div><p id="repairCopyStatus" role="status"></p></div></dialog>
+<a class="contact-float" href="https://wa.me/5527998784657" target="_blank" rel="noopener noreferrer" aria-label="Conversar com a equipe pelo WhatsApp"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8 9 9 0 0 1-3.5-.7L4 20l1.2-4.5A8 8 0 1 1 20 11.5Z" stroke="currentColor" stroke-width="1.8"/><path d="M8 11.5h8M8 8.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>WhatsApp</span></a>
 </body>
 </html>
