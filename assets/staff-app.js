@@ -13,6 +13,8 @@
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
     return token;
   })();
+  const catalogRecords = new Map();
+  let editingOrderVersion = null;
   let session = null;
   let sessionExpiresAt = 0;
   let staff = null;
@@ -539,7 +541,7 @@
     const deviceDetail = [order.color, order.storage_capacity].filter(Boolean).join(" · ");
     return "<tr><td><strong>" + esc(order.order_number) + "</strong></td><td>" + esc(customer) +
       "</td><td>" + esc([order.brand, order.model].filter(Boolean).join(" ")) + (deviceDetail ? "<br><small>" + esc(deviceDetail) + "</small>" : "") + "</td><td>" + statusCell +
-      "</td><td>" + esc(dateText(order.received_at)) + "</td><td>" + notifyCell + "</td></tr>";
+      "</td><td>" + esc(dateText(order.received_at)) + "</td><td>" + notifyCell + (withAction ? '<br><button class="staff-small-action" type="button" data-edit-order="' + esc(order.id) + '">Editar OS</button>' : "") + "</td></tr>";
   }
 
   async function loadOrders(target) {
@@ -551,6 +553,63 @@
     });
     const html = table(["OS", "Cliente", "Aparelho", "Status", "Entrada", "Aviso ao cliente"], rows.map(row => orderRow(row, true)), "Nenhuma ordem de serviço cadastrada.");
     target.innerHTML = html;
+  }
+
+  async function openOrderEditor(id) {
+    const dialog = $("#edit-order-dialog"), form = $("#edit-order-form");
+    if (!dialog || !form || !session) return;
+    message("staff-global-message", "Carregando OS...");
+    try {
+      const rows = await getRows("work_orders", { select: "id,order_number,brand,model,color,storage_capacity,platform,reported_issue,physical_condition,accessories,internal_notes,updated_at,customers(name)", id: "eq." + id, limit: "1" });
+      const order = rows[0];
+      if (!order) throw new Error("OS não encontrada ou sem permissão de acesso.");
+      form.reset(); editingOrderVersion = order.updated_at;
+      form.elements.namedItem("id").value = order.id;
+      for (const field of ["brand", "model", "color", "storage_capacity", "platform", "reported_issue", "physical_condition", "internal_notes"]) form.elements.namedItem(field).value = order[field] || "";
+      form.elements.namedItem("accessories").value = (order.accessories || []).join(", ");
+      $("#edit-order-title").textContent = "Editar OS " + order.order_number;
+      $("#edit-order-customer").textContent = "Cliente: " + (order.customers?.name || "—");
+      message("edit-order-message", ""); message("staff-global-message", "");
+      dialog.showModal(); form.elements.namedItem("brand").focus();
+    } catch (error) { message("staff-global-message", error.message, true); }
+  }
+
+  async function saveOrderDetails(form) {
+    const data = new FormData(form), details = {};
+    for (const key of ["brand", "model", "color", "storage_capacity", "platform", "reported_issue", "physical_condition", "internal_notes"]) details[key] = String(data.get(key) || "").trim();
+    if (!details.brand || !details.model || !details.reported_issue) throw new Error("Informe marca, modelo e problema relatado.");
+    details.accessories = String(data.get("accessories") || "").split(",").map(value => value.trim()).filter(Boolean);
+    const result = await api("/rest/v1/rpc/edit_work_order_details", { method: "POST", body: { p_order_id: data.get("id"), p_expected_updated_at: editingOrderVersion, p_details: details } });
+    if (!result?.length) throw new Error("A edição não foi salva. Atualize a OS e tente novamente.");
+    $("#edit-order-dialog").close(); editingOrderVersion = null;
+    await loadDashboardData(); await loadOrders($("#orders-table"));
+    message("staff-global-message", "OS atualizada com sucesso.");
+  }
+
+  function resetCatalogEditor() {
+    const form = $("#catalog-form"); form.reset();
+    form.elements.namedItem("productId").value = "";
+    form.elements.namedItem("expectedUpdatedAt").value = "";
+    $("#catalog-form-title").textContent = "Adicionar produto ao catálogo";
+    $("#catalog-cancel-edit").hidden = true;
+    form.querySelector('button[type="submit"]').textContent = "Salvar produto";
+  }
+
+  function openCatalogEditor(id) {
+    const item = catalogRecords.get(id), form = $("#catalog-form");
+    if (!item) return;
+    form.reset(); form.elements.namedItem("productId").value = item.id;
+    form.elements.namedItem("expectedUpdatedAt").value = item.updated_at;
+    form.elements.namedItem("name").value = item.name;
+    form.elements.namedItem("description").value = item.description || "";
+    form.elements.namedItem("price").value = item.price ?? "";
+    form.elements.namedItem("imageUrl").value = item.image_url || "";
+    form.elements.namedItem("isPublished").checked = item.is_published;
+    $("#catalog-form-title").textContent = "Editar produto";
+    $("#catalog-cancel-edit").hidden = false;
+    form.querySelector('button[type="submit"]').textContent = "Salvar alterações";
+    message("catalog-message", "Editando: " + item.name);
+    form.scrollIntoView({ behavior: "smooth", block: "center" }); form.elements.namedItem("name").focus({ preventScroll: true });
   }
 
   async function onOrderStatusChange(event) {
@@ -602,11 +661,12 @@
   }
 
   async function loadCatalog() {
-    const rows = await getRows("catalog_items", { select: "id,name,description,price,is_published,position", order: "position.asc,name.asc", limit: "300" });
+    const rows = await getRows("catalog_items", { select: "id,name,description,price,image_url,is_published,position,updated_at", order: "position.asc,name.asc", limit: "300" });
+    catalogRecords.clear(); rows.forEach(item => catalogRecords.set(item.id, item));
     $("#catalog-table").innerHTML = table(["Produto", "Preço", "Visibilidade", "Ação"], rows.map(row =>
       "<tr><td><strong>" + esc(row.name) + "</strong><br>" + esc(row.description) + "</td><td>" + (row.price === null ? "Consultar" : esc(money(row.price))) +
       "</td><td>" + (row.is_published ? "Publicado" : "Rascunho") + '</td><td><button class="staff-small-action" type="button" data-toggle-product="' +
-      esc(row.id) + '" data-published="' + String(row.is_published) + '">' + (row.is_published ? "Retirar do site" : "Publicar") + "</button></td></tr>"
+      esc(row.id) + '" data-published="' + String(row.is_published) + '">' + (row.is_published ? "Retirar do site" : "Publicar") + '</button> <button class="staff-small-action" type="button" data-edit-product="' + esc(row.id) + '">Editar produto</button> <button class="staff-small-action staff-danger-action" type="button" data-delete-product="' + esc(row.id) + '">Excluir produto</button></td></tr>'
     ), "Nenhum produto cadastrado.");
   }
 
@@ -869,21 +929,21 @@
     }, "quote-message");
 
     setupForm("catalog-form", async form => {
-      const data = new FormData(form);
+      const data = new FormData(form), id = String(data.get("productId") || "");
       const image = String(data.get("imageUrl") || "").trim();
       if (image && new URL(image).protocol !== "https:") throw new Error("A imagem precisa usar HTTPS.");
-      await api("/rest/v1/catalog_items", { method: "POST", body: {
-        name: String(data.get("name")).trim(),
-        description: String(data.get("description") || "").trim(),
-        price: data.get("price") ? Number(data.get("price")) : null,
-        image_url: image || null,
-        is_published: data.get("isPublished") === "on",
-        created_by: staff.user_id
-      }});
-      form.reset();
-      message("catalog-message", "Produto salvo.");
-      await loadCatalog();
+      const name = String(data.get("name") || "").trim();
+      const price = data.get("price") ? Number(data.get("price")) : null;
+      if (!name || (price !== null && (!Number.isFinite(price) || price < 0))) throw new Error("Informe um nome e um preço válido.");
+      const body = { name, description: String(data.get("description") || "").trim(), price, image_url: image || null, is_published: data.get("isPublished") === "on", updated_at: new Date().toISOString() };
+      if (!id) body.created_by = staff.user_id;
+      const path = id ? endpoint("catalog_items", { id: "eq." + id, updated_at: "eq." + data.get("expectedUpdatedAt") }) : "/rest/v1/catalog_items";
+      const result = await api(path, { method: id ? "PATCH" : "POST", body });
+      if (id && !result?.length) throw new Error("O produto foi alterado em outra sessão. Cancele a edição, atualize a lista e abra novamente.");
+      resetCatalogEditor(); message("catalog-message", id ? "Produto atualizado." : "Produto cadastrado.");
+      await loadCatalog(); await loadOverview();
     }, "catalog-message");
+    setupForm("edit-order-form", saveOrderDetails, "edit-order-message");
 
     setupForm("inventory-form", async form => {
       const data = new FormData(form);
@@ -1101,18 +1161,30 @@
   }));
 
   $("#catalog-table")?.addEventListener("click", async event => {
-    const button = event.target.closest("[data-toggle-product]");
+    const edit = event.target.closest("[data-edit-product]");
+    if (edit) { openCatalogEditor(edit.dataset.editProduct); return; }
+    const button = event.target.closest("[data-toggle-product], [data-delete-product]");
     if (!button) return;
+    const id = button.dataset.toggleProduct || button.dataset.deleteProduct;
+    const item = catalogRecords.get(id); if (!item) return;
+    const deleting = Boolean(button.dataset.deleteProduct);
+    if (deleting && !window.confirm('Excluir o produto "' + item.name + '"? Ele será removido do cadastro e da vitrine. Essa ação não pode ser desfeita.')) return;
     button.disabled = true;
     try {
-      await api("/rest/v1/catalog_items?id=eq." + encodeURIComponent(button.dataset.toggleProduct), {
-        method: "PATCH", body: { is_published: button.dataset.published !== "true" }
-      });
-      await loadCatalog();
-      await loadOverview();
-    } catch (error) { message("catalog-message", error.message, true); }
+      const result = await api(endpoint("catalog_items", { id: "eq." + id, updated_at: "eq." + item.updated_at }), deleting
+        ? { method: "DELETE", headers: { Prefer: "return=representation" } }
+        : { method: "PATCH", body: { is_published: !item.is_published, updated_at: new Date().toISOString() } });
+      if (!result?.length) throw new Error("O produto foi alterado em outra sessão. Atualize a lista e tente novamente.");
+      if ($("#catalog-form").elements.namedItem("productId").value === id) resetCatalogEditor();
+      await loadCatalog(); await loadOverview();
+      message("catalog-message", deleting ? "Produto excluído." : "Visibilidade atualizada.");
+    } catch (error) { message("catalog-message", error.code === "23503" ? "Este produto possui registros vinculados. Você pode retirá-lo da vitrine." : error.message, true); }
     finally { button.disabled = false; }
   });
+  $("#catalog-cancel-edit")?.addEventListener("click", () => { resetCatalogEditor(); message("catalog-message", "Edição cancelada."); });
+  $("#orders-table")?.addEventListener("click", event => { const button = event.target.closest("[data-edit-order]"); if (button) void openOrderEditor(button.dataset.editOrder); });
+  $("#edit-order-close")?.addEventListener("click", () => $("#edit-order-dialog").close());
+  $("#edit-order-cancel")?.addEventListener("click", () => $("#edit-order-dialog").close());
 
   setupForms();
   setupDeviceCatalog();

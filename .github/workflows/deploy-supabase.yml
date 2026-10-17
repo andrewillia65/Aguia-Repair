@@ -41,6 +41,7 @@ jobs:
                     DB_URL="$(python3 -c 'import os, urllib.parse; project=os.environ["SUPABASE_PROJECT_ID"]; password=urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""); print(f"postgresql://postgres.{project}:{password}@aws-0-sa-east-1.pooler.supabase.com:5432/postgres")')"
           echo "::add-mask::$DB_URL"
           supabase db push --db-url "$DB_URL" --yes
+          psql "$DB_URL" -X -f scripts/test-order-edit.sql
           unset DB_URL
 
       - name: Set server-side encryption and rate-limit secrets

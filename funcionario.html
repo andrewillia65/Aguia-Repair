@@ -11,11 +11,14 @@
   <link rel="stylesheet" href="assets/staff.css">
   <script src="assets/supabase-config.js" defer></script>
   <script src="assets/device-catalog.js" defer></script>
-  <script src="assets/staff-app.js?v=6" defer></script>
+  <script src="assets/staff-app.js?v=7" defer></script>
   <link rel="stylesheet" href="assets/liquid-glass.css?v=3">
   <link rel="icon" type="image/png" href="assets/aguia-repair-logo-2026.png?v=1">
   <link rel="stylesheet" href="assets/repair-gold.css?v=2">
-</head>
+<style>
+.repair-edit-dialog{width:min(760px,calc(100% - 28px));max-height:calc(100dvh - 28px);padding:0;border:1px solid #d9d5ca;border-radius:18px;overflow:auto;background:#fffefa;color:#252624}.repair-edit-dialog::backdrop{background:#171815a6}.repair-edit-dialog-inner{padding:26px}.repair-edit-dialog .quote-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.repair-edit-dialog .quote-heading h2{margin:0;font-size:25px}.repair-edit-dialog .quote-heading button{min-width:44px;min-height:44px;border:1px solid #d9d5ca;border-radius:10px;background:#fffefa;cursor:pointer}.staff-table .staff-small-action{min-height:40px;padding:8px 12px;border:1px solid #d5c390;border-radius:9px;background:#f5ebd5;color:#5e4619;font:inherit;font-size:12px;cursor:pointer;margin:4px 4px 4px 0;white-space:nowrap}.staff-table .staff-danger-action{background:#fff1ed;color:#922d25;border-color:#e4b9b0}body .staff-table [data-order-status]{background:#fffefa;color:#30312c;border:1px solid #d4cdbb;border-radius:9px;min-height:42px;padding:8px}body .staff-notify-link{color:#176b39;background:#eff9f0;border-color:#97c99e}.repair-edit-dialog [hidden],#catalog-cancel-edit[hidden]{display:none!important}
+@media(max-width:600px){.repair-edit-dialog-inner{padding:20px 16px}.repair-edit-dialog .staff-form-grid{grid-template-columns:1fr}}
+</style></head>
 <body class="simple-home staff-page">
   <a class="skip" href="#conteudo">Pular para o conteúdo</a>
   <header class="header wrap staff-header">
@@ -136,13 +139,13 @@
           <section class="staff-screen" data-screen="catalog" hidden>
             <div class="staff-screen-heading"><div><p class="eyebrow">VITRINE PÚBLICA</p><h2>Produtos</h2></div></div>
             <form id="catalog-form" class="staff-panel staff-form staff-form-grid">
-              <h3 class="form-section-title">Adicionar produto ao catálogo</h3>
+              <h3 class="form-section-title" id="catalog-form-title">Adicionar produto ao catálogo</h3><input type="hidden" name="productId"><input type="hidden" name="expectedUpdatedAt">
               <label>Nome<input name="name" required maxlength="160"></label>
               <label>Preço (opcional)<input name="price" type="number" min="0" step="0.01"></label>
               <label class="span-two">Descrição<textarea name="description" rows="2" maxlength="2000"></textarea></label>
               <label class="span-two">Imagem (URL segura)<input name="imageUrl" type="url" maxlength="1000"></label>
               <label class="staff-checkbox span-two"><input name="isPublished" type="checkbox"> Publicar no site</label>
-              <button class="staff-action span-two" type="submit">Salvar produto</button>
+              <button class="staff-action span-two" type="submit">Salvar produto</button><button id="catalog-cancel-edit" class="staff-action" type="button" hidden>Cancelar edição</button>
               <p id="catalog-message" class="staff-message span-two" role="status" aria-live="polite"></p>
             </form>
             <div id="catalog-table" class="staff-panel staff-table-wrap"><p class="staff-empty">Carregando catálogo...</p></div>
@@ -243,5 +246,6 @@
     </section>
   </main>
   <footer class="simple-footer wrap"><span>ÁGUIA REPAIR</span><span>Área exclusiva da equipe</span></footer>
+<dialog id="edit-order-dialog" class="repair-edit-dialog" aria-labelledby="edit-order-title"><div class="repair-edit-dialog-inner"><div class="quote-heading"><h2 id="edit-order-title">Editar OS</h2><button id="edit-order-close" type="button" aria-label="Fechar edição">✕</button></div><p id="edit-order-customer"></p><form id="edit-order-form" class="staff-form staff-form-grid"><input name="id" type="hidden"><label>Marca<input name="brand" maxlength="80" required></label><label>Modelo<input name="model" maxlength="120" required></label><label>Cor<input name="color" maxlength="80"></label><label>Armazenamento<input name="storage_capacity" maxlength="80"></label><label>Sistema<select name="platform"><option value="">Não informado</option><option value="android">Android</option><option value="iphone">iPhone</option><option value="other">Outro</option></select></label><label class="span-two">Problema informado<textarea name="reported_issue" rows="3" required maxlength="4000"></textarea></label><label class="span-two">Estado físico<textarea name="physical_condition" rows="2" maxlength="3000"></textarea></label><label class="span-two">Acessórios entregues<input name="accessories" maxlength="1000" placeholder="Separe por vírgulas"></label><label class="span-two">Observações internas<textarea name="internal_notes" rows="3" maxlength="3000"></textarea></label><p class="span-two">O número da OS, o cliente e o histórico são preservados. Altere o status pela lista de ordens.</p><button class="staff-action" type="submit">Salvar alterações</button><button id="edit-order-cancel" class="staff-action" type="button">Cancelar</button><p id="edit-order-message" class="staff-message span-two" role="status" aria-live="polite"></p></form></div></dialog>
 </body>
 </html>
